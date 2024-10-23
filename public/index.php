@@ -2,11 +2,15 @@
 
 declare(strict_types=1);
 
+use App\Controller\ProductController;
+use App\Middleware\AddJsonResponseHeader;
 use DI\ContainerBuilder;
 use Dotenv\Dotenv;
+use Slim\Exception\HttpNotFoundException;
 use Slim\Factory\AppFactory;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
+use Slim\Handlers\Strategies\RequestResponseArgs;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -20,17 +24,22 @@ AppFactory::setContainer($container);
 
 $app = AppFactory::create();
 
-$app->get('/', function (Request $request, Response $response) {
-    
-    $repository = $this->get(App\Repositories\ProductRepository::class);
+$app->addBodyParsingMiddleware();
 
-    $data = $repository->getAll();
+$collector = $app->getRouteCollector();
 
-    $body = json_encode($data);
+$collector->setDefaultInvocationStrategy(new RequestResponseArgs);
 
-    $response->getBody()->write($body);
+$errorMiddlleware = $app->addErrorMiddleware(true, true, true);
 
-    return $response->withHeader('Content-Type', 'application/json');
-});
+$errorHandler = $errorMiddlleware->getDefaultErrorHandler();
+
+$errorHandler->forceContentType('application/json');
+
+$app->add(new AddJsonResponseHeader);
+
+$app->get('/api/products', [ProductController::class, 'index']);
+
+$app->get('/api/products/{productId:[0-9]+}', [ProductController::class, 'show']);
 
 $app->run();
