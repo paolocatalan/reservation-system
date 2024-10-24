@@ -7,17 +7,17 @@ namespace App\Repositories;
 use App\Database;
 use PDO;
 
-class ProductRepository
+class RestaurantRepository
 {
     public function __construct(
-        public Database $database 
-    ) { }
+        private Database $database
+    ) { } 
 
     public function getAll(): array
     {
         $pdo = $this->database->getConnection();
 
-        $stmt = $pdo->query('SELECT * FROM product'); 
+        $stmt = $pdo->query('SELECT * FROM restaurant'); 
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } 
@@ -25,7 +25,7 @@ class ProductRepository
     public function getById(int $id): array|bool
     {
         $sql = 'SELECT *
-                FROM product
+                FROM restaurant
                 WHERE id = :id';
 
         $pdo = $this->database->getConnection();
@@ -39,17 +39,5 @@ class ProductRepository
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function reserveProduct(int $id, string $date): bool
-    {
-        $stmt = $this->database->prepare('
-            UPDATE product
-            SET reserved_at = :date, updated_at = NOW()
-            WHERE id = :id
-        ');
 
-        $stmt->bindValue(':date', $date);
-        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-
-        return $stmt->execute();
-    }
 }

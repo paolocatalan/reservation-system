@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Controller\ProductController;
+use App\Controller\ScheduleController;
 use App\Middleware\AddJsonResponseHeader;
 use DI\ContainerBuilder;
 use Dotenv\Dotenv;
@@ -39,6 +40,8 @@ $errorHandler->forceContentType('application/json');
 $app->add(new AddJsonResponseHeader);
 
 $app->get('/api/products', [ProductController::class, 'index']);
+
+$app->get('/scheduled', [ScheduleController::class, 'create']);
 
 $app->get('/api/products/{productId:[0-9]+}', [ProductController::class, 'show']);
 

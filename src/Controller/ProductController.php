@@ -41,4 +41,28 @@ class ProductController
         return $response;
 
     }
+
+    public function create() {
+    
+    }
+
+    public function update(Request $request, Response $response): Response
+    {
+        $id = 1;
+        $date = "2024-11-02 10:00:00";
+
+        $reserved = $this->repository->reserveProduct($id, $date);
+
+        if ($reserved === false) {
+            throw new HttpNotFoundException($request, message: 'product not found');
+        }
+
+        $data = $this->repository->getById($id);
+
+        $body = json_encode($data);
+
+        $response->getBody()->write($body);
+
+        return $response;
+    }
 }

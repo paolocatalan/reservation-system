@@ -7,7 +7,7 @@ namespace App\Repositories;
 use App\Database;
 use PDO;
 
-class ProductRepository
+class ScheduleRepository
 {
     public function __construct(
         public Database $database 
@@ -17,7 +17,7 @@ class ProductRepository
     {
         $pdo = $this->database->getConnection();
 
-        $stmt = $pdo->query('SELECT * FROM product'); 
+        $stmt = $pdo->query('SELECT * FROM schedule'); 
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } 
@@ -25,7 +25,7 @@ class ProductRepository
     public function getById(int $id): array|bool
     {
         $sql = 'SELECT *
-                FROM product
+                FROM schedule
                 WHERE id = :id';
 
         $pdo = $this->database->getConnection();
@@ -39,17 +39,19 @@ class ProductRepository
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function reserveProduct(int $id, string $date): bool
+    public function reserveProduct(int $id, string $date): int 
     {
-        $stmt = $this->database->prepare('
-            UPDATE product
-            SET reserved_at = :date, updated_at = NOW()
-            WHERE id = :id
-        ');
+        $query = 'INSERT INTO schedule (date, product_id, created_at, updated_at) VALUES (:date, :product_id, NOW(), NOW())';
+
+        $pdo = $this->database->getConnection();
+
+        $stmt = $pdo->prepare($query);
 
         $stmt->bindValue(':date', $date);
-        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':product_id', $id);
 
-        return $stmt->execute();
+        $stmt->execute();
+
+        return (int) $pdo->lastInsertId();
     }
 }
