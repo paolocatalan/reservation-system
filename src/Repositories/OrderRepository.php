@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+
 use App\Database;
 use PDO;
 
-class ProductRepository
+class OrderRepository
 {
     public function __construct(
         public Database $database 
@@ -15,7 +16,7 @@ class ProductRepository
 
     public function getAll(): array
     {
-        $stmt = $this->database->query('SELECT * FROM product'); 
+        $stmt = $this->database->query('SELECT * FROM `order`'); 
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } 
@@ -23,7 +24,7 @@ class ProductRepository
     public function getById(int $id): array|bool
     {
         $sql = 'SELECT *
-                FROM product
+                FROM `order`
                 WHERE id = :id';
 
         $stmt = $this->database->prepare($sql);
@@ -35,17 +36,17 @@ class ProductRepository
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function reserveProduct(int $id, string $date): bool
-    {
-        $stmt = $this->database->prepare('
-            UPDATE product
-            SET reserved_at = :date, updated_at = NOW()
-            WHERE id = :id
-        ');
+    public function create(array $order) {
+        $query = 'INSERT INTO `order` (name, email, created_at, updated_at) VALUES (:name, :email, NOW(), NOW())';
 
-        $stmt->bindValue(':date', $date);
-        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt = $this->database->prepare($query);
 
-        return $stmt->execute();
+        $stmt->bindValue(':name', $order['name']);
+        $stmt->bindValue(':email', $order['email']);
+
+        $stmt->execute();
+
+        return (int) $this->database->lastInsertId();
+
     }
 }

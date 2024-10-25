@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App;
 
@@ -9,29 +9,31 @@ use PDOException;
 
 class Database
 {
+    private PDO $pdo;
+
     public function __construct(
         private string $host,
         private string $name,
         private string $user,
         private string $password
-    ) { }
-
-    public function getConnection(): PDO
+    ) 
     {
         try {
-            $dsn = "mysql:host=$this->host;dbname=$this->name;charset=utf8";
-
-            return new PDO($dsn, $this->user, $this->password, [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-            ]);
+            $this->pdo = new PDO('mysql:host=' . $this->host . ';dbname=' . $this->name, $this->user, $this->password,
+                [
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+                ]
+            );
         } catch (PDOException $e) {
             throw new PDOException($e->getMessage(), (int) $e->getCode());
         }
+
     }
 
     public function __call($name, $arguments)
     {
-        return call_user_func_array([$this->getConnection(), $name], $arguments);
+        return call_user_func_array([$this->pdo, $name], $arguments);
     }
 
 }

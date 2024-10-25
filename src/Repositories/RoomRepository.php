@@ -7,15 +7,15 @@ namespace App\Repositories;
 use App\Database;
 use PDO;
 
-class RestaurantRepository
+class RoomRepository
 {
     public function __construct(
-        private Database $database
-    ) { } 
+        public Database $database 
+    ) {}
 
     public function getAll(): array
     {
-        $stmt = $this->database->query('SELECT * FROM restaurant'); 
+        $stmt = $this->database->query('SELECT * FROM Room'); 
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } 
@@ -23,7 +23,7 @@ class RestaurantRepository
     public function getById(int $id): array|bool
     {
         $sql = 'SELECT *
-                FROM restaurant
+                FROM Room
                 WHERE id = :id';
 
         $stmt = $this->database->prepare($sql);
@@ -35,20 +35,19 @@ class RestaurantRepository
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function reserveTable(array $order) {
-        $query = 'INSERT INTO restaurant (order_id, table_setting, reservation_date, created_at, updated_at) VALUES (:order_id, :table_setting, :reservation_date, NOW(), NOW())';
+    public function reserveRoom(array $order): int 
+    {
+        $query = 'INSERT INTO room (order_id, room_type, checkin_date, checkin_out, updated_at, created_at) VALUES (:order_id, :room_type, :checkin_date, :checkin_out, NOW(), NOW())';
 
         $stmt = $this->database->prepare($query);
 
         $stmt->bindValue(':order_id', $order['order_id']);
-        $stmt->bindValue(':table_setting', $order['table_setting']);
-        $stmt->bindValue(':reservation_date', $order['restaurant_date']);
+        $stmt->bindValue(':room_type', $order['room_type']);
+        $stmt->bindValue(':checkin_date', $order['checkin_date']);
+        $stmt->bindValue(':checkin_out', $order['checkout_date']);
 
         $stmt->execute();
 
         return (int) $this->database->lastInsertId();
-
     }
-
-
 }

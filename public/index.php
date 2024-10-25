@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Controller\OrderController;
 use App\Controller\ProductController;
-use App\Controller\ScheduleController;
 use App\Middleware\AddJsonResponseHeader;
 use DI\ContainerBuilder;
 use Dotenv\Dotenv;
-use Slim\Exception\HttpNotFoundException;
 use Slim\Factory\AppFactory;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
@@ -41,8 +40,8 @@ $app->add(new AddJsonResponseHeader);
 
 $app->get('/api/products', [ProductController::class, 'index']);
 
-$app->get('/scheduled', [ScheduleController::class, 'create']);
-
 $app->get('/api/products/{productId:[0-9]+}', [ProductController::class, 'show']);
+
+$app->get('/order', [OrderController::class, 'create']);
 
 $app->run();

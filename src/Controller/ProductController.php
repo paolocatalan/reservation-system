@@ -42,10 +42,6 @@ class ProductController
 
     }
 
-    public function create() {
-    
-    }
-
     public function update(Request $request, Response $response): Response
     {
         $id = 1;
