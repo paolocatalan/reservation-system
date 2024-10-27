@@ -53,9 +53,9 @@ class OrderRepository
             SELECT order.id, name, email, room_type, checkin_date, table_setting, reservation_date
             FROM `order`
             LEFT JOIN room
-            ON order.id = order_id
+            ON order.id = room.order_id
             LEFT JOIN restaurant
-            ON order.id = order_id 
+            ON order.id = restaurant.order_id 
             WHERE order.id = ?
             ');
 
