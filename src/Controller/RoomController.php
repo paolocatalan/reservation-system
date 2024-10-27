@@ -17,7 +17,9 @@ class RoomController
     public function index(Request $request, Response $response): Response
     {
         $data = $this->repository->getAll();
+
         $body = json_encode($data);
+
         $response->getBody()->write($body);
 
         return $response;

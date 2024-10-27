@@ -17,30 +17,29 @@ class RestaurantRepository
     {
         $stmt = $this->database->query('SELECT * FROM restaurant'); 
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll();
     } 
 
     public function getById(int $id): array|bool
     {
-        $sql = 'SELECT *
-                FROM restaurant
-                WHERE id = :id';
+        $query = 'SELECT * FROM restaurant WHERE id = :id';
 
-        $stmt = $this->database->prepare($sql);
+        $stmt = $this->database->prepare($query);
 
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
 
         $stmt->execute();
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        return $stmt->fetch();
     }
 
-    public function reserveTable(array $order) {
+    public function reserveTable(array $order, int $orderId): int
+    {
         $query = 'INSERT INTO restaurant (order_id, table_setting, reservation_date, created_at, updated_at) VALUES (:order_id, :table_setting, :reservation_date, NOW(), NOW())';
 
         $stmt = $this->database->prepare($query);
 
-        $stmt->bindValue(':order_id', $order['order_id']);
+        $stmt->bindValue(':order_id', $orderId);
         $stmt->bindValue(':table_setting', $order['table_setting']);
         $stmt->bindValue(':reservation_date', $order['restaurant_date']);
 

@@ -31,9 +31,7 @@ class ReservationService
 
             $this->database->commit();
 
-
         } catch (\Throwable $th) {
-
             if ($this->database->inTransaction()) {
                 $this->database->rollBack();
             }

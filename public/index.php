@@ -44,4 +44,6 @@ $app->get('/api/products/{productId:[0-9]+}', [ProductController::class, 'show']
 
 $app->get('/order', [OrderController::class, 'create']);
 
+$app->get('/find', [OrderController::class, 'findOrder']);
+
 $app->run();

@@ -44,7 +44,8 @@ class OrderController
 
     }
 
-    public function create(Request $request, Response $response): Response {
+    public function create(Request $request, Response $response): Response
+    {
         $order = [
             'room_type' => "Family Room",
             'checkin_date' => "2024-11-27 12:00:00",
@@ -62,6 +63,20 @@ class OrderController
         $response->getBody()->write($body);
 
         return $response;
+    }
+
+    public function findOrder(Request $request, Response $response): Response
+    {
+        $id = 14;
+
+        $data = $this->orderRepository->find($id);
+
+        $body = json_encode($data);
+
+        $response->getBody()->write($body);
+
+        return $response;
+
     }
 
 }
