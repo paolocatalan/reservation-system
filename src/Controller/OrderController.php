@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Enums\RoomType;
+use App\Enums\TableSetting;
 use App\Repositories\OrderRepository;
 use App\Services\ReservationService;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -53,15 +55,27 @@ class OrderController
 
         $validator->rule('required', ['room_type', 'checkin_date', 'checkout_date', 'name', 'email']);
 
+        $currentDate = date('Y-m-d H:i:s');
+
+        $validator->mapFieldsRules([
+            'room_type' => ['required', ['subset', array_column(RoomType::cases(), 'value')]],
+            'checkin_date' => ['required', 'date', ['dateFormat', 'Y-m-d H:i:s'], ['dateAfter', $currentDate]],
+            'checkout_date' => ['required', 'date', ['dateFormat', 'Y-m-d H:i:s'], ['dateAfter', $currentDate]],
+            'table_setting' => [['subset', array_column(TableSetting::cases(), 'value')]],
+            'restaurant_date' => ['date', ['dateFormat', 'Y-m-d H:i:s'], ['dateAfter', $requestData['checkin_date']], ['dateBefore', $requestData['checkout_date']]],
+            'name' => ['required'],
+            'email' => ['required', 'email']
+        ]);
+
         if (!$validator->validate()) {
             $response->getBody()->write(json_encode($validator->errors()));
-            return $response->withStatus(403);
+            return $response->withStatus(422);
         }
         
         $orderId = $this->reservationService->processOrder($requestData);
 
         $body = json_encode([
-            'message' => 'Your order has been successfully placed.',
+            'message' => 'Your reservation was successfully created.',
             'id' => $orderId
         ]);
 
