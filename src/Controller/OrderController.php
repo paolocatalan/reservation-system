@@ -9,12 +9,13 @@ use App\Services\ReservationService;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Exception\HttpNotFoundException;
+use Valitron\Validator;
 
 class OrderController
 {
     public function __construct(
         private OrderRepository $orderRepository,
-        private ReservationService $reservationService
+        private ReservationService $reservationService,
     ) { }
 
     public function index(Request $request, Response $response): Response
@@ -47,6 +48,15 @@ class OrderController
     public function create(Request $request, Response $response): Response
     {
         $requestData = $request->getParsedBody();
+
+        $validator = new Validator($requestData);
+
+        $validator->rule('required', ['room_type', 'checkin_date', 'checkout_date', 'name', 'email']);
+
+        if (!$validator->validate()) {
+            $response->getBody()->write(json_encode($validator->errors()));
+            return $response->withStatus(403);
+        }
         
         $orderId = $this->reservationService->processOrder($requestData);
 
@@ -57,7 +67,7 @@ class OrderController
 
         $response->getBody()->write($body);
 
-        return $response;
+        return $response->withStatus(201);
     }
 
     public function findOrder(Request $request, Response $response): Response
