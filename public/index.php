@@ -42,7 +42,7 @@ $app->get('/api/products', [ProductController::class, 'index']);
 
 $app->get('/api/products/{productId:[0-9]+}', [ProductController::class, 'show']);
 
-$app->get('/order', [OrderController::class, 'create']);
+$app->post('/order', [OrderController::class, 'create']);
 
 $app->get('/find', [OrderController::class, 'findOrder']);
 

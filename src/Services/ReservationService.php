@@ -18,16 +18,16 @@ class ReservationService
         private RoomRepository $roomRepository  
     ) { }
 
-    public function processOrder(array $order): array
+    public function processOrder(array $order): int 
     {
         try {
             $this->database->beginTransaction();
 
             $orderId = $this->orderRepository->create($order);
 
-            $roomId = $this->roomRepository->reserveRoom($order, $orderId);
+            $this->roomRepository->reserveRoom($order, $orderId);
 
-            $restaurantId = $this->restaurantRepository->reserveTable($order, $orderId);
+            $this->restaurantRepository->reserveTable($order, $orderId);
 
             $this->database->commit();
 
@@ -39,11 +39,9 @@ class ReservationService
             throw $th;
         }
 
-        return [
-            'order_id' => $orderId,
-            'room_id' => $roomId,
-            'restaurant_id' => $restaurantId 
-        ];
+        // $this->orderRepository->find($orderId)
+
+        return $orderId;
 
     }
 }

@@ -46,19 +46,14 @@ class OrderController
 
     public function create(Request $request, Response $response): Response
     {
-        $order = [
-            'room_type' => "Family Room",
-            'checkin_date' => "2024-11-27 12:00:00",
-            'checkout_date' => "2024-11-28 12:00:00",
-            'table_setting' => "Five Course Table Setting",
-            'restaurant_date' => "2024-11-27 18:00:00",
-            'name' => "Lex",
-            'email' => "lex@aipodcast.com"
-        ];
+        $requestData = $request->getParsedBody();
+        
+        $orderId = $this->reservationService->processOrder($requestData);
 
-        $data = $this->reservationService->processOrder($order);
-
-        $body = json_encode($data);
+        $body = json_encode([
+            'message' => 'Your order has been successfully placed.',
+            'id' => $orderId
+        ]);
 
         $response->getBody()->write($body);
 
