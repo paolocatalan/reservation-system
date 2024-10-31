@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Enums\RoomType;
 use App\Enums\TableSetting;
 use App\Repositories\OrderRepository;
+use App\RequestValidator\CreateOrderValidator;
 use App\Services\ReservationService;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -49,30 +50,18 @@ class OrderController
 
     public function create(Request $request, Response $response): Response
     {
-        $requestData = $request->getParsedBody();
-
-        $validator = new Validator($requestData);
-
-        $validator->rule('required', ['room_type', 'checkin_date', 'checkout_date', 'name', 'email']);
-
-        $currentDate = date('Y-m-d H:i:s');
-
-        $validator->mapFieldsRules([
-            'room_type' => ['required', ['subset', array_column(RoomType::cases(), 'value')]],
-            'checkin_date' => ['required', 'date', ['dateFormat', 'Y-m-d H:i:s'], ['dateAfter', $currentDate]],
-            'checkout_date' => ['required', 'date', ['dateFormat', 'Y-m-d H:i:s'], ['dateAfter', $currentDate]],
-            'table_setting' => [['subset', array_column(TableSetting::cases(), 'value')]],
-            'restaurant_date' => ['date', ['dateFormat', 'Y-m-d H:i:s'], ['dateAfter', $requestData['checkin_date']], ['dateBefore', $requestData['checkout_date']]],
-            'name' => ['required'],
-            'email' => ['required', 'email']
-        ]);
-
+        $validator = new CreateOrderValidator($request->getParsedBody());
+ 
         if (!$validator->validate()) {
-            $response->getBody()->write(json_encode($validator->errors()));
+
+            $body = json_encode($validator->errorBag());
+            $response->getBody()->write($body);
+
             return $response->withStatus(422);
-        }
-        
-        $orderId = $this->reservationService->processOrder($requestData);
+
+        } 
+
+        $orderId = $this->reservationService->processOrder($request->getParsedBody());
 
         $body = json_encode([
             'message' => 'Your reservation was successfully created.',
