@@ -15,7 +15,7 @@ class ReservationService
         private Database $database,
         private OrderRepository $orderRepository,
         private RestaurantRepository $restaurantRepository,
-        private RoomRepository $roomRepository  
+        private RoomRepository $roomRepository, 
     ) { }
 
     public function processOrder(array $order): int 

@@ -4,21 +4,18 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Enums\RoomType;
-use App\Enums\TableSetting;
 use App\Repositories\OrderRepository;
 use App\RequestValidator\CreateOrderValidator;
+use App\Services\InvoiceService;
 use App\Services\ReservationService;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Exception\HttpNotFoundException;
-use Valitron\Validator;
 
 class OrderController
 {
     public function __construct(
         private OrderRepository $orderRepository,
-        private ReservationService $reservationService,
     ) { }
 
     public function index(Request $request, Response $response): Response
@@ -45,23 +42,22 @@ class OrderController
         $response->getBody()->write($body);
 
         return $response;
-
     }
 
-    public function create(Request $request, Response $response): Response
+    public function create(Request $request, Response $response, ReservationService $reservationService, InvoiceService $invoiceService): Response
     {
         $validator = new CreateOrderValidator($request->getParsedBody());
  
         if (!$validator->validate()) {
-
             $body = json_encode($validator->errorBag());
             $response->getBody()->write($body);
 
             return $response->withStatus(422);
-
         } 
 
-        $orderId = $this->reservationService->processOrder($request->getParsedBody());
+        $orderId = $reservationService->processOrder($request->getParsedBody());
+
+        $payment = $invoiceService->process($orderId);
 
         $body = json_encode([
             'message' => 'Your reservation was successfully created.',
@@ -84,7 +80,6 @@ class OrderController
         $response->getBody()->write($body);
 
         return $response;
-
     }
 
 }
