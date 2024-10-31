@@ -6,5 +6,5 @@ namespace App\Services;
 
 interface PaymentGatewayService
 {
-    public function charge(): bool;
+    public function charge($customerName, $amount, $tax): bool;
 }

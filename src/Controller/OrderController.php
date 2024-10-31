@@ -16,6 +16,8 @@ class OrderController
 {
     public function __construct(
         private OrderRepository $orderRepository,
+        private ReservationService $reservationService,
+        private InvoiceService $invoiceService
     ) { }
 
     public function index(Request $request, Response $response): Response
@@ -44,7 +46,7 @@ class OrderController
         return $response;
     }
 
-    public function create(Request $request, Response $response, ReservationService $reservationService, InvoiceService $invoiceService): Response
+    public function create(Request $request, Response $response): Response
     {
         $validator = new CreateOrderValidator($request->getParsedBody());
  
@@ -55,13 +57,14 @@ class OrderController
             return $response->withStatus(422);
         } 
 
-        $orderId = $reservationService->processOrder($request->getParsedBody());
+        $paid = $this->invoiceService->process($request->getParsedBody());
 
-        $payment = $invoiceService->process($orderId);
+        // add queue system
+        // $orderId = $this->reservationService->processOrder($request->getParsedBody());
 
         $body = json_encode([
             'message' => 'Your reservation was successfully created.',
-            'id' => $orderId
+            'id' => $paid
         ]);
 
         $response->getBody()->write($body);

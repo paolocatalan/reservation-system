@@ -8,10 +8,10 @@ use App\Services\PaymentGatewayService;
 
 class Visa implements PaymentGatewayService
 {
-  public function __construct(array $customer, array $invoice, float $tax) {}
+    public function charge($customerName, $amount, $tax): bool
+    {
+        $total = $amount + $tax;
 
-  public function charge(): bool
-  {
-     return true;
-  }
+        return true;
+    }
 }

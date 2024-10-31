@@ -34,7 +34,9 @@ class CreateOrderValidator
             'table_setting' => [['subset', array_column(TableSetting::cases(), 'value')]],
             'restaurant_date' => [['requiredWith', 'table_setting'], 'date', ['dateFormat', 'Y-m-d H:i:s'], ['dateAfter', $this->data['checkin_date']], ['dateBefore', $this->data['checkout_date']]],
             'name' => ['required'],
-            'email' => ['required', 'email']
+            'email' => ['required', 'email'],
+            'amount' => ['required', 'numeric'],
+            'credit_card' => ['required']
         ]);
     }
 
