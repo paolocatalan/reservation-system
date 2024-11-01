@@ -6,7 +6,7 @@ namespace App\Services;
 
 class EmailService
 {
-  public function send(array $account, string $template): bool
+  public function send(array $order, string $template): bool
   {
     return true;
   }

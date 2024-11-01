@@ -57,14 +57,14 @@ class OrderController
             return $response->withStatus(422);
         } 
 
-        $paid = $this->invoiceService->process($request->getParsedBody());
+        $invoiceId = $this->invoiceService->process($request->getParsedBody());
 
-        // add queue system
-        // $orderId = $this->reservationService->processOrder($request->getParsedBody());
+        $orderId = $this->reservationService->add($request->getParsedBody());
 
         $body = json_encode([
             'message' => 'Your reservation was successfully created.',
-            'id' => $paid
+            'invoice_id' => $invoiceId,
+            'order_id' => $orderId
         ]);
 
         $response->getBody()->write($body);

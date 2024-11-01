@@ -8,6 +8,5 @@ class SalesTaxService
 {
     public function calculate(float $amount) {
         return $amount * 0.12;
-    
     }
 }

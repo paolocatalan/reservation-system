@@ -18,7 +18,7 @@ class ReservationService
         private RoomRepository $roomRepository, 
     ) { }
 
-    public function processOrder(array $order): int 
+    public function add(array $order): int 
     {
         try {
             $this->database->beginTransaction();

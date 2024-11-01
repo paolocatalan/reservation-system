@@ -12,17 +12,15 @@ class InvoiceService
         protected EmailService $emailService
     ) { }
 
-    public function process(array $order): bool
+    public function process(array $order): int|bool
     {
         $tax = $this->salesTaxService->calculate((float) $order['amount']);
 
-        if (!$this->paymentGatewayService->charge($order['name'], $order['amount'], $tax)) {
-            return false;
-        }
+        $invoiceId = $this->paymentGatewayService->charge($order['name'], $order['amount'], $tax);
 
         $this->emailService->send($order, 'receipt');
 
-        return true;
+        return $invoiceId;
     }
 }
 
