@@ -10,8 +10,9 @@ use PDO;
 class RestaurantRepository
 {
     public function __construct(
-        private Database $database
-    ) { } 
+        public Database $database
+    ) {}
+
 
     public function getAll(): array
     {
@@ -49,5 +50,15 @@ class RestaurantRepository
 
     }
 
+    public function getFutureDates(): array
+    {
+        $query = 'SELECT id, table_setting, reservation_date FROM restaurant WHERE reservation_date > NOW()';
+
+        $stmt = $this->database->prepare($query);
+
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
 
 }

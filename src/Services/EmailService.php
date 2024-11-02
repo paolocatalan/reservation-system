@@ -6,9 +6,9 @@ namespace App\Services;
 
 class EmailService
 {
-  public function send(array $order, string $template): bool
-  {
-    return true;
-  }
+    public function send(array $order, string $template): bool
+    {
+        return true;
+    }
 
 }

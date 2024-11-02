@@ -24,6 +24,8 @@ AppFactory::setContainer($container);
 
 $app = AppFactory::create();
 
+// require dirname(__DIR__) . '/configs/console.php';
+
 $app->addBodyParsingMiddleware();
 
 $collector = $app->getRouteCollector();

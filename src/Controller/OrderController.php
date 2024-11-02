@@ -4,20 +4,25 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Message\AddReservation;
 use App\Repositories\OrderRepository;
+use App\Repositories\RestaurantRepository;
+use App\Repositories\RoomRepository;
 use App\RequestValidator\CreateOrderValidator;
 use App\Services\InvoiceService;
-use App\Services\ReservationService;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Exception\HttpNotFoundException;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class OrderController
 {
     public function __construct(
         private OrderRepository $orderRepository,
-        private ReservationService $reservationService,
-        private InvoiceService $invoiceService
+        private InvoiceService $invoiceService,
+        // private MessageBusInterface $bus,
+        private RoomRepository $roomRepository,
+        private RestaurantRepository $restaurantRepository
     ) { }
 
     public function index(Request $request, Response $response): Response
@@ -57,14 +62,13 @@ class OrderController
             return $response->withStatus(422);
         } 
 
-        $invoiceId = $this->invoiceService->process($request->getParsedBody());
+        $invoiceId = $this->invoiceService->process($validator->validate());
 
-        $orderId = $this->reservationService->add($request->getParsedBody());
+        // $this->bus->dispatch(new AddReservation($validator->validate()));
 
         $body = json_encode([
             'message' => 'Your reservation was successfully created.',
-            'invoice_id' => $invoiceId,
-            'order_id' => $orderId
+            'invoice_id' => $invoiceId
         ]);
 
         $response->getBody()->write($body);
@@ -74,9 +78,10 @@ class OrderController
 
     public function findOrder(Request $request, Response $response): Response
     {
-        $id = 14;
+        // $id = 14;
 
-        $data = $this->orderRepository->find($id);
+        // $data = $this->orderRepository->find($id);
+        $data = $this->roomRepository->getFutureDates();
 
         $body = json_encode($data);
 

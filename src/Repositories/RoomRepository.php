@@ -48,4 +48,17 @@ class RoomRepository
 
         return (int) $this->database->lastInsertId();
     }
+
+    public function getFutureDates(): array
+    {
+        $query = 'SELECT id, order_id, room_type, checkin_date, checkin_out FROM room WHERE checkin_date > NOW()';
+
+        $stmt = $this->database->prepare($query);
+
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+
 }
