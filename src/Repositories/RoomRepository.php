@@ -4,15 +4,8 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
-use App\Database;
-use PDO;
-
-class RoomRepository
+class RoomRepository extends BaseRepository
 {
-    public function __construct(
-        public Database $database 
-    ) { }
-
     public function getAll(): array
     {
         $stmt = $this->database->query('SELECT * FROM Room'); 
@@ -26,7 +19,7 @@ class RoomRepository
 
         $stmt = $this->database->prepare($query);
 
-        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
 
         $stmt->execute();
 

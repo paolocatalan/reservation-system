@@ -4,15 +4,8 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
-use App\Database;
-use PDO;
-
-class OrderRepository
+class OrderRepository extends BaseRepository
 {
-    public function __construct(
-        public Database $database 
-    ) { }
-
     public function getAll(): array
     {
         $stmt = $this->database->query('SELECT * FROM `order`'); 
@@ -26,7 +19,7 @@ class OrderRepository
 
         $stmt = $this->database->prepare($query);
 
-        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
 
         $stmt->execute();
 
