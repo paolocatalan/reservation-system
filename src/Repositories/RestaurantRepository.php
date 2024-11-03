@@ -39,18 +39,31 @@ class RestaurantRepository extends BaseRepository
         $stmt->execute();
 
         return (int) $this->database->lastInsertId();
-
     }
 
-    public function getFutureDates(): array
+    public function getAllReservation(): array
     {
-        $query = 'SELECT id, table_setting, reservation_date FROM restaurant WHERE reservation_date > NOW()';
-
-        $stmt = $this->database->prepare($query);
-
-        $stmt->execute();
+        $stmt = $this->database->query('
+            SELECT order.id, invoice_id, name, email, amount, table_setting, reservation_date
+            FROM `order`
+            INNER JOIN restaurant
+            ON order.id = restaurant.order_id
+            WHERE reservation_date > NOW() 
+            ');
 
         return $stmt->fetchAll();
     }
 
+    public function findReservation(int $id): array|bool
+    {
+        $query = 'SELECT order_id, table_settings, reservation_date FROM restaurant WHERE order_id = :id';
+
+        $stmt = $this->database->prepare($query);
+
+        $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
+
+        $stmt->execute();
+
+        return $stmt->fetch();
+    }
 }
