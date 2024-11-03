@@ -10,13 +10,13 @@ class InvoiceService
         protected SalesTaxService $salesTaxService,
         protected PaymentGatewayService $paymentGatewayService,
         protected EmailService $emailService
-    ) { }
+    ) {}
 
-    public function process(array $order): int|bool
+    public function process(array $order): array 
     {
         $tax = $this->salesTaxService->calculate((float) $order['amount']);
 
-        $invoiceId = $this->paymentGatewayService->charge($order['name'], $order['amount'], $tax);
+        $invoiceId = $this->paymentGatewayService->charge($order['email'], $order['amount'], $tax);
 
         $this->emailService->send($order, 'receipt');
 

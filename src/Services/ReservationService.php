@@ -18,16 +18,18 @@ class ReservationService
         private RoomRepository $roomRepository, 
     ) { }
 
-    public function add(array $order): int 
+    public function add(array $order, int $invoiceId): int 
     {
         try {
             $this->database->beginTransaction();
 
-            $orderId = $this->orderRepository->create($order);
+            $orderId = $this->orderRepository->create($order, $invoiceId);
 
             $this->roomRepository->reserveRoom($order, $orderId);
 
-            $this->restaurantRepository->reserveTable($order, $orderId);
+            if ($order['table_setting']) {
+                $this->restaurantRepository->reserveTable($order, $orderId);
+            }
 
             $this->database->commit();
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Controller\OrderController;
 use App\Controller\ProductController;
+use App\Controller\RestaurantController;
 use App\Middleware\AddJsonResponseHeader;
 use DI\ContainerBuilder;
 use Dotenv\Dotenv;
@@ -44,7 +45,9 @@ $app->get('/api/products', [ProductController::class, 'index']);
 
 $app->get('/api/products/{productId:[0-9]+}', [ProductController::class, 'show']);
 
-$app->post('/order', [OrderController::class, 'create']);
+$app->post('/order', [OrderController::class, 'store']);
+
+$app->post('/restaurant', [RestaurantController::class, 'store']);
 
 $app->get('/find', [OrderController::class, 'findOrder']);
 

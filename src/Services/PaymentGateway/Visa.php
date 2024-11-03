@@ -8,10 +8,16 @@ use App\Services\PaymentGatewayService;
 
 class Visa implements PaymentGatewayService
 {
-    public function charge($customerName, $amount, $tax): bool
+    public function charge($customerEmail, $amount, $tax): array
     {
         $total = $amount + $tax;
 
-        return true;
+        $invoiceId = mt_rand(8000, 9000);
+
+        return [
+            'id' => $invoiceId,
+            'total' => $total,
+            'status' => true
+        ];
     }
 }
