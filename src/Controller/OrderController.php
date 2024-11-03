@@ -83,7 +83,7 @@ class OrderController
 
         // $data = $this->orderRepository->find($id);
         // $data = $this->roomRepository->getFutureDates();
-        $data = $this->roomRepository->getAllReservation();
+        $data = $this->orderRepository->getAllReservation();
 
         $body = json_encode($data);
 

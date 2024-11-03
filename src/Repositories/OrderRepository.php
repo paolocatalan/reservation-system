@@ -63,17 +63,15 @@ class OrderRepository extends BaseRepository
 
     public function getAllReservation(): array
     {
-        $sql = '
-            SELECT id, name, amount, room_type, checkin_date, checkout_date, table_setting, reservation_date 
+        $stmt = $this->database->query('
+            SELECT order.id, name, amount, room_type, checkin_date, checkout_date, table_setting, reservation_date 
             FROM `order`
-            INNER JOIN room
+            LEFT JOIN room
             ON order.id = room.order_id
-            INNER JOIN restaurant
+            LEFT JOIN restaurant
             ON order.id = restaurant.order_id
-            WHERE reservation_date > NOW()
-        ';
-
-        $stmt = $this->database->query($sql);
+            WHERE room.checkin_date > NOW() OR restaurant.reservation_date > NOW()
+        ');
 
         return $stmt->fetchAll();
     }
