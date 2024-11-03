@@ -23,7 +23,7 @@ class RestaurantService
 
             $orderId = $this->orderRepository->create($order, $invoiceId);
 
-            $this->restaurantRepository->reserveTable($order, $orderId);
+            $this->restaurantRepository->create($order, $orderId);
 
             $this->database->commit();
 

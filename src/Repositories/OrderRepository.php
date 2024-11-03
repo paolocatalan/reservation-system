@@ -42,14 +42,14 @@ class OrderRepository extends BaseRepository
         return (int) $this->database->lastInsertId();
     }
     
-    public function find(int $id): array
+    public function getByOrderId(int $id): array
     {
         $stmt = $this->database->prepare('
-            SELECT order.id, name, email, room_type, checkin_date, checkout_date, table_setting, reservation_date
+            SELECT order.id, name, room_type, checkin_date, checkout_date, table_setting, reservation_date
             FROM `order`
-            INNER JOIN room
+            LEFT JOIN room
             ON order.id = room.order_id
-            INNER JOIN restaurant
+            LEFT JOIN restaurant
             ON order.id = restaurant.order_id 
             WHERE order.id = ?
             ');

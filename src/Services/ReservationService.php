@@ -25,10 +25,10 @@ class ReservationService
 
             $orderId = $this->orderRepository->create($order, $invoiceId);
 
-            $this->roomRepository->reserveRoom($order, $orderId);
+            $this->roomRepository->create($order, $orderId);
 
             if ($order['table_setting']) {
-                $this->restaurantRepository->reserveTable($order, $orderId);
+                $this->restaurantRepository->create($order, $orderId);
             }
 
             $this->database->commit();

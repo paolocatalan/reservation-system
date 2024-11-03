@@ -79,11 +79,10 @@ class OrderController
 
     public function findOrder(Request $request, Response $response): Response
     {
-        // $id = 14;
+        // $id = 2;
 
-        // $data = $this->orderRepository->find($id);
-        // $data = $this->roomRepository->getFutureDates();
-        $data = $this->orderRepository->getAllReservation();
+        // $data = $this->restaurantRepository->getByOrderId($id);
+        $data = $this->roomRepository->getAllReservation();
 
         $body = json_encode($data);
 

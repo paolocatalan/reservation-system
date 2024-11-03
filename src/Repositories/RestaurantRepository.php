@@ -26,7 +26,7 @@ class RestaurantRepository extends BaseRepository
         return $stmt->fetch();
     }
 
-    public function reserveTable(array $order, int $orderId): int
+    public function create(array $order, int $orderId): int
     {
         $query = 'INSERT INTO restaurant (order_id, table_setting, reservation_date, created_at, updated_at) VALUES (:order_id, :table_setting, :reservation_date, NOW(), NOW())';
 
@@ -41,24 +41,15 @@ class RestaurantRepository extends BaseRepository
         return (int) $this->database->lastInsertId();
     }
 
-    public function getAllReservation(): array
+    public function getByOrderId(int $id): array|bool
     {
-        $stmt = $this->database->query('
-            SELECT order.id, invoice_id, name, email, amount, table_setting, reservation_date
-            FROM `order`
-            INNER JOIN restaurant
-            ON order.id = restaurant.order_id
-            WHERE reservation_date > NOW() 
+        $stmt = $this->database->prepare('
+            SELECT order.id, name, amount, table_setting, reservation_date
+            FROM restaurant
+            JOIN `order`
+            ON restaurant.order_id = order.id
+            WHERE order_id = :id
             ');
-
-        return $stmt->fetchAll();
-    }
-
-    public function findReservation(int $id): array|bool
-    {
-        $query = 'SELECT order_id, table_settings, reservation_date FROM restaurant WHERE order_id = :id';
-
-        $stmt = $this->database->prepare($query);
 
         $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
 
@@ -66,4 +57,18 @@ class RestaurantRepository extends BaseRepository
 
         return $stmt->fetch();
     }
+
+    public function getAllReservation(): array
+    {
+        $stmt = $this->database->query('
+            SELECT order.id, invoice_id, name, amount, table_setting, reservation_date
+            FROM `order`
+            RIGHT JOIN restaurant
+            ON order.id = restaurant.order_id
+            WHERE reservation_date > NOW() 
+            ');
+
+        return $stmt->fetchAll();
+    }
+
 }
