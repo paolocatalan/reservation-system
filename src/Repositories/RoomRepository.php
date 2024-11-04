@@ -72,4 +72,21 @@ class RoomRepository extends BaseRepository
         return $stmt->fetchAll();
     }
 
+    public function getAvailability(string $checkDate)
+    {
+        $stmt = $this->database->prepare('
+            SELECT COUNT(room_type) as room_type_count
+            FROM room
+            WHERE :check_availability_date BETWEEN checkin_date AND checkout_date
+            ');
+
+        $stmt->bindParam(':check_availability_date', $checkDate);
+
+        $stmt->execute();
+
+        $result = $stmt->fetch();
+
+        return $result ? $result['room_type_count'] : 0;
+    }
+
 }
