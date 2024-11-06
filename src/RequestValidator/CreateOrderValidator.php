@@ -29,8 +29,9 @@ class CreateOrderValidator
             'room_type' => ['required', ['subset', array_column(RoomType::cases(), 'value')]],
             'checkin_date' => ['required', 'date', ['dateFormat', 'Y-m-d H:i:s'], ['dateAfter', date('Y-m-d H:i:s')]],
             'checkout_date' => ['required', 'date', ['dateFormat', 'Y-m-d H:i:s'], ['dateAfter', date('Y-m-d H:i:s')]],
-            'table_setting' => [['subset', array_column(TableSetting::cases(), 'value')]],
-            'restaurant_date' => [['requiredWith', 'table_setting'], 'date', ['dateFormat', 'Y-m-d H:i:s'], ['dateAfter', $data['checkin_date']], ['dateBefore', $data['checkout_date']]],
+            'seats' => ['numeric'], // add a validation for max and min
+            'table_setting' => [['requiredWith', 'seats'], ['subset', array_column(TableSetting::cases(), 'value')]],
+            'restaurant_date' => [['requiredWith', 'seats'], 'date', ['dateFormat', 'Y-m-d H:i:s'], ['dateAfter', $data['checkin_date']], ['dateBefore', $data['checkout_date']]],
             'name' => ['required'],
             'email' => ['required', 'email'],
             'amount' => ['required', 'numeric'],

@@ -2,15 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Controller\OrderController;
 use App\Controller\ProductController;
-use App\Controller\RestaurantController;
 use App\Middleware\AddJsonResponseHeader;
 use DI\ContainerBuilder;
 use Dotenv\Dotenv;
 use Slim\Factory\AppFactory;
-use Slim\Psr7\Request;
-use Slim\Psr7\Response;
 use Slim\Handlers\Strategies\RequestResponseArgs;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
@@ -24,8 +20,6 @@ $container = $containerBuilder->addDefinitions(dirname(__DIR__) . '/configs/defi
 AppFactory::setContainer($container);
 
 $app = AppFactory::create();
-
-// require dirname(__DIR__) . '/configs/console.php';
 
 $app->addBodyParsingMiddleware();
 
@@ -44,11 +38,5 @@ $app->add(new AddJsonResponseHeader);
 $app->get('/api/products', [ProductController::class, 'index']);
 
 $app->get('/api/products/{productId:[0-9]+}', [ProductController::class, 'show']);
-
-$app->post('/order', [OrderController::class, 'store']);
-
-$app->post('/restaurant', [RestaurantController::class, 'store']);
-
-$app->get('/find', [ProductController::class, 'findOrder']);
 
 $app->run();
