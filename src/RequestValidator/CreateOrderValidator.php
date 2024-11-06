@@ -6,23 +6,28 @@ namespace App\RequestValidator;
 
 use App\Enums\RoomType;
 use App\Enums\TableSetting;
+use App\Repositories\RoomRepository;
 use Valitron\Validator;
 
 class CreateOrderValidator
 {
+    protected $roomRepository;
     protected $validator;
     protected $data;
     protected $errors = [];
 
-    public function __construct(array $data)
+    public function __construct(RoomRepository $roomRepository, array $data)
     {
+        $this->roomRepository = $roomRepository;
         $this->data = $data;
         $this->validator = new Validator($data);
     }
 
     public function validate(): array|bool
     {
-        $this->validator->rule('required', ['room_type', 'checkin_date', 'checkout_date', 'name', 'email']);
+        $this->validator->rule(function($field, $value, $params, $fields) {
+            return $this->isFullyBooked($value); 
+        }, 'checkin_date')->message('Checkin date is not available.');
 
         $this->validator->mapFieldsRules([
             'room_type' => ['required', ['subset', array_column(RoomType::cases(), 'value')]],
@@ -46,5 +51,21 @@ class CreateOrderValidator
 
     public function errorBag() {
         return $this->errors;
+    }
+
+    public function isFullyBooked(string $date): bool {
+        $bookedRooms = $this->roomRepository->getAvailability($this->data['room_type'], $date);
+
+        $numbersOfRoom = match($this->data['room_type']) {
+            'Cabana' => 10,
+            'Villa' => 5,
+            'Penthouse' => 2 
+        };
+
+        if ($bookedRooms >= $numbersOfRoom) {
+            return false;
+        }
+
+        return true;
     }
 }

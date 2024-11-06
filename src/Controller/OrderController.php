@@ -10,6 +10,7 @@ use App\Repositories\RoomRepository;
 use App\RequestValidator\CreateOrderValidator;
 use App\Services\InvoiceService;
 use App\Services\ReservationService;
+use DI\Container;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Exception\HttpNotFoundException;
@@ -52,7 +53,7 @@ class OrderController
 
     public function store(Request $request, Response $response): Response
     {
-        $validator = new CreateOrderValidator($request->getParsedBody());
+        $validator = new CreateOrderValidator($this->roomRepository, $request->getParsedBody());
  
         if (!$validator->validate()) {
             $body = json_encode($validator->errorBag());
@@ -82,7 +83,7 @@ class OrderController
         // $id = 2;
 
         // $data = $this->restaurantRepository->getByOrderId($id);
-        $data = $this->roomRepository->getAvailability('2024-11-05 12:00:00');
+        $data = $this->roomRepository->getAvailability('Villa', '2024-11-09 12:00:00');
 
         $body = json_encode($data);
 

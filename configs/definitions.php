@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Database;
 use App\Message\AddReservation;
 use App\MessageHandler\AddReservationHandler;
+use App\Repositories\RoomRepository;
 use App\Services\PaymentGateway\Visa;
 use App\Services\PaymentGatewayService;
 use App\Services\ReservationService;
@@ -27,6 +28,10 @@ return [
             password: $_ENV['DB_PASS'] 
         );
     },
+    // RoomRepository::class => DI\autowire(RoomRepository::class),
+    // RoomRepository::class => function(ContainerInterface $container) {
+    //     return new RoomRepository($container->get(Database::class));
+    // }, 
     PaymentGatewayService::class => fn(ContainerInterface $container) => $container->get(Visa::class),
     // MessageBusInterface::class => function (ContainerInterface $container) {
     //     $reservation = $container->get(ReservationService::class);
