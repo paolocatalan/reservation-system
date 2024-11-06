@@ -84,7 +84,7 @@ class OrderController
 
         // $data = $this->restaurantRepository->getByOrderId($id);
         // $data = $this->roomRepository->getAvailability('Villa', '2024-11-09 12:00:00');
-        $data = $this->restaurantRepository->getAvailability('Informal Table Setting', '2024-11-05 18:00:00');
+        $data = $this->restaurantRepository->getAvailability('Informal Table Setting', '2024-11-08 18:00:00');
 
         $body = json_encode($data);
 

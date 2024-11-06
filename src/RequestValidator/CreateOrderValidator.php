@@ -11,14 +11,12 @@ use Valitron\Validator;
 
 class CreateOrderValidator
 {
-    protected $roomRepository;
     protected $validator;
     protected $data;
     protected $errors = [];
 
-    public function __construct(RoomRepository $roomRepository, array $data)
+    public function __construct(protected RoomRepository $roomRepository, array $data)
     {
-        $this->roomRepository = $roomRepository;
         $this->data = $data;
         $this->validator = new Validator($data);
     }

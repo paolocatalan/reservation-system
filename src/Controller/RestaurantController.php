@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\RequestValidator\StoreReservTableValidator;
 use App\Services\InvoiceService;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -14,19 +15,28 @@ class RestaurantController
     public function __construct(
         private InvoiceService $invoiceService,
         private RestaurantService $restaurantService,
+        private StoreReservTableValidator $validator
     ) {}
 
     public function store(Request $request, Response $response): Response
     {
-        $body = $request->getParsedBody();
+        $validated = $this->validator->validate($request->getParsedBody());
 
-        $invoice = $this->invoiceService->process($body);
+        if (!$validated) {
+            $body = json_encode($this->validator->errorBag());
+            $response->getBody()->write($body);
+
+            return $response->withStatus(422);
+        } 
+
+        $invoice = $this->invoiceService->process($validated);
         
-        $data = $this->restaurantService->add($body, $invoice['id']);
+        $data = $this->restaurantService->add($validated, $invoice['id']);
 
         $content = json_encode([
             'message' => 'Your table is reserved.',
-            'reservation_details' => $data
+            'invoice number' => $invoice['id'],
+            'reservation details' => $data
         ]);
 
         $response->getBody()->write($content);
