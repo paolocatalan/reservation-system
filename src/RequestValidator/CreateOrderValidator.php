@@ -27,7 +27,7 @@ class CreateOrderValidator
     {
         $this->validator->rule(function($field, $value, $params, $fields) {
             return $this->isFullyBooked($value); 
-        }, 'checkin_date')->message('Checkin date is not available.');
+        }, 'checkin_date')->message($this->data['room_type'] . ' is fully booked on these dates.');
 
         $this->validator->mapFieldsRules([
             'room_type' => ['required', ['subset', array_column(RoomType::cases(), 'value')]],
@@ -42,6 +42,7 @@ class CreateOrderValidator
         ]);
 
         if ($this->validator->validate()) {
+            // we should return the validated inputs not the data from the agruments
             return $this->data;
         } else {
             $this->errors = $this->validator->errors();

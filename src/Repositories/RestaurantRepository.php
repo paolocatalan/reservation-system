@@ -71,4 +71,24 @@ class RestaurantRepository extends BaseRepository
         return $stmt->fetchAll();
     }
 
+    public function getAvailability(string $tableSetting, string $checkDate): int
+    {
+        $stmt = $this->database->prepare('
+            SELECT COUNT(id) as table_setting_count
+            FROM restaurant
+            WHERE table_setting = :table_setting
+            AND reservation_date = :check_reservation_date 
+            ');
+
+        $stmt->bindValue(':table_setting', $tableSetting);
+        $stmt->bindValue(':check_reservation_date', $checkDate);
+
+        $stmt->execute();
+
+        $result = $stmt->fetch();
+
+        return $result ? $result['table_setting_count'] : 0;
+    }
+
+
 }

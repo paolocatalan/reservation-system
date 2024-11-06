@@ -72,7 +72,7 @@ class RoomRepository extends BaseRepository
         return $stmt->fetchAll();
     }
 
-    public function getAvailability(string $roomType, string $checkDate)
+    public function getAvailability(string $roomType, string $checkDate): int
     {
         $stmt = $this->database->prepare('
             SELECT COUNT(id) as room_type_count
