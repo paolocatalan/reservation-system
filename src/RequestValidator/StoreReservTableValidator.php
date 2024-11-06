@@ -10,7 +10,7 @@ use Valitron\Validator;
 
 class StoreReservTableValidator
 {
-    private $errors;
+    private $errors = [];
 
     public function __construct(
         protected RestaurantRepository $restaurantRepository

@@ -21,7 +21,8 @@ class OrderController
         private InvoiceService $invoiceService,
         private ReservationService $reservationService,
         private RoomRepository $roomRepository,
-        private RestaurantRepository $restaurantRepository
+        private RestaurantRepository $restaurantRepository,
+        private CreateOrderValidator $validator
     ) { }
 
     public function index(Request $request, Response $response): Response
@@ -52,20 +53,19 @@ class OrderController
 
     public function store(Request $request, Response $response): Response
     {
-        // refactor this to not have arguments on constructor, so we can instantiate via container
-        $validator = new CreateOrderValidator($this->roomRepository, $request->getParsedBody());
+        $validated = $this->validator->validate($request->getParsedBody());
  
-        if (!$validator->validate()) {
-            $body = json_encode($validator->errorBag());
+        if (!$validated) {
+            $body = json_encode($this->validator->errorBag());
             $response->getBody()->write($body);
 
             return $response->withStatus(422);
         } 
 
-        $invoice = $this->invoiceService->process($validator->validate());
+        $invoice = $this->invoiceService->process($validated);
 
         // $this->bus->dispatch(new AddReservation($validator->validate()));
-        $orderId = $this->reservationService->add($validator->validate(), $invoice['id']);
+        $orderId = $this->reservationService->add($validated, $invoice['id']);
 
         $body = json_encode([
             'message' => 'Your reservation was successfully created.',
