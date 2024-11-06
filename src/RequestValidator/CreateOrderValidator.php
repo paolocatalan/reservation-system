@@ -46,7 +46,7 @@ class CreateOrderValidator
         }
     }
 
-    public function errorBag() {
+    public function errorBag():array {
         return $this->errors;
     }
 

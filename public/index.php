@@ -49,6 +49,6 @@ $app->post('/order', [OrderController::class, 'store']);
 
 $app->post('/restaurant', [RestaurantController::class, 'store']);
 
-$app->get('/find', [OrderController::class, 'findOrder']);
+$app->get('/find', [ProductController::class, 'findOrder']);
 
 $app->run();

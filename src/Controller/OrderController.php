@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Repositories\OrderRepository;
-use App\Repositories\RestaurantRepository;
-use App\Repositories\RoomRepository;
 use App\RequestValidator\CreateOrderValidator;
 use App\Services\InvoiceService;
 use App\Services\ReservationService;
@@ -20,10 +18,8 @@ class OrderController
         private OrderRepository $orderRepository,
         private InvoiceService $invoiceService,
         private ReservationService $reservationService,
-        private RoomRepository $roomRepository,
-        private RestaurantRepository $restaurantRepository,
         private CreateOrderValidator $validator
-    ) { }
+    ) {}
 
     public function index(Request $request, Response $response): Response
     {
@@ -76,21 +72,6 @@ class OrderController
         $response->getBody()->write($body);
 
         return $response->withStatus(201);
-    }
-
-    public function findOrder(Request $request, Response $response): Response
-    {
-        // $id = 2;
-
-        // $data = $this->restaurantRepository->getByOrderId($id);
-        // $data = $this->roomRepository->getAvailability('Villa', '2024-11-09 12:00:00');
-        $data = $this->restaurantRepository->getAvailability('Informal Table Setting', '2024-11-08 18:00:00');
-
-        $body = json_encode($data);
-
-        $response->getBody()->write($body);
-
-        return $response;
     }
 
 }

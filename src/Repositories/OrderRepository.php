@@ -45,7 +45,7 @@ class OrderRepository extends BaseRepository
     public function getByOrderId(int $id): array
     {
         $stmt = $this->database->prepare('
-            SELECT order.id, name, room_type, checkin_date, checkout_date, table_setting, reservation_date
+            SELECT order.id, name, room_type, checkin_date, checkout_date, seats, table_setting, reservation_date
             FROM `order`
             LEFT JOIN room
             ON order.id = room.order_id

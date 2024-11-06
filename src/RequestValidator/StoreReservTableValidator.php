@@ -16,16 +16,18 @@ class StoreReservTableValidator
         protected RestaurantRepository $restaurantRepository
     ) {}
 
-    public function validate(array $data) {
+    public function validate(array $data): array|bool
+    {
         $validator = new Validator($data);
 
-        $validator->rule(function($field, $value, $params, $fields) use ($data) {
-            return $this->isNotAvailable($data['table_setting'], $value); 
-        }, 'restaurant_date')->message($data['table_setting'] . ' is fully booked on these dates.');
+        $validator->rule(function($field, $value, $params, $fields) {
+            return $this->isNotAvailable($value); 
+        }, 'restaurant_date')->message('No available seat for your date.');
 
         $validator->mapFieldsRules([
-            'table_setting' => [['subset', array_column(TableSetting::cases(), 'value')]],
-            'restaurant_date' => [['requiredWith', 'table_setting'], 'date', ['dateFormat', 'Y-m-d H:i:s']],
+            'seats' => ['required', 'numeric'], // add a validation for max and min
+            'table_setting' => ['required', ['subset', array_column(TableSetting::cases(), 'value')]],
+            'restaurant_date' => ['required', 'date', ['dateFormat', 'Y-m-d H:i:s'], ['dateAfter', date('Y-m-d H:i:s')]],
             'name' => ['required'],
             'email' => ['required', 'email'],
             'amount' => ['required', 'numeric'],
@@ -41,20 +43,22 @@ class StoreReservTableValidator
 
     }
 
-    public function errorBag() {
+    public function errorBag(): array {
         return $this->errors;
     }
 
-    public function isNotAvailable(string $tableSetting, string $checkDate) {
-        $bookedTables = $this->restaurantRepository->getAvailability($tableSetting, $checkDate);
+    public function isNotAvailable(string $startTime): bool {
+        $endTime = date('Y-m-d H:i:s', strtotime('+8 hours', strtotime($startTime)));
 
-        $numbersOfTables = match($tableSetting) {
-            'Informal Table Setting' => 10,
-            'Formal Table Setting' => 10,
-            'Five Course Table Setting' => 5 
-        };
+        $bookedSeats = $this->restaurantRepository->getAllReservSeats($startTime, $endTime);
 
-        if ($bookedTables >= $numbersOfTables) {
+        $numberOfSeats = 0;
+
+        foreach ($bookedSeats as $item) {
+            $numberOfSeats += $item['seats'];
+        }
+
+        if ($numberOfSeats >= 20) {
             return false;
         }
 

@@ -28,11 +28,12 @@ class RestaurantRepository extends BaseRepository
 
     public function create(array $order, int $orderId): int
     {
-        $query = 'INSERT INTO restaurant (order_id, table_setting, reservation_date, created_at, updated_at) VALUES (:order_id, :table_setting, :reservation_date, NOW(), NOW())';
+        $query = 'INSERT INTO restaurant (order_id, seats, table_setting, reservation_date, created_at, updated_at) VALUES (:order_id, :seats, :table_setting, :reservation_date, NOW(), NOW())';
 
         $stmt = $this->database->prepare($query);
 
         $stmt->bindValue(':order_id', $orderId);
+        $stmt->bindValue(':seats', $order['seats']);
         $stmt->bindValue(':table_setting', $order['table_setting']);
         $stmt->bindValue(':reservation_date', $order['restaurant_date']);
 
@@ -44,7 +45,7 @@ class RestaurantRepository extends BaseRepository
     public function getByOrderId(int $id): array|bool
     {
         $stmt = $this->database->prepare('
-            SELECT order.id, name, amount, table_setting, reservation_date
+            SELECT order.id, name, amount, seats, table_setting, reservation_date
             FROM restaurant
             JOIN `order`
             ON restaurant.order_id = order.id
@@ -61,7 +62,7 @@ class RestaurantRepository extends BaseRepository
     public function getAllReservation(): array
     {
         $stmt = $this->database->query('
-            SELECT order.id, invoice_id, name, amount, table_setting, reservation_date
+            SELECT order.id, invoice_id, name, amount, seats, table_setting, reservation_date
             FROM `order`
             RIGHT JOIN restaurant
             ON order.id = restaurant.order_id
@@ -71,23 +72,20 @@ class RestaurantRepository extends BaseRepository
         return $stmt->fetchAll();
     }
 
-    public function getAvailability(string $tableSetting, string $checkDate): int
+    public function getAllReservSeats(string $startTime, string $endTime): array
     {
         $stmt = $this->database->prepare('
-            SELECT COUNT(id) as table_setting_count
+            SELECT seats
             FROM restaurant
-            WHERE table_setting = :table_setting
-            AND reservation_date = :check_reservation_date 
+            WHERE reservation_date BETWEEN :start_time AND :end_time 
             ');
 
-        $stmt->bindValue(':table_setting', $tableSetting);
-        $stmt->bindValue(':check_reservation_date', $checkDate);
+        $stmt->bindValue(':start_time', $startTime);
+        $stmt->bindValue(':end_time', $endTime);
 
         $stmt->execute();
 
-        $result = $stmt->fetch();
-
-        return $result ? $result['table_setting_count'] : 0;
+        return $stmt->fetchAll();
     }
 
 
