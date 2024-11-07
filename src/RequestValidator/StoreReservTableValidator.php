@@ -43,11 +43,11 @@ class StoreReservTableValidator
 
     }
 
-    public function errorBag(): array {
+    protected function errorBag(): array {
         return $this->errors;
     }
 
-    public function isNotAvailable(string $startTime): bool {
+    private function isNotAvailable(string $startTime): bool {
         $endTime = date('Y-m-d H:i:s', strtotime('+8 hours', strtotime($startTime)));
 
         $bookedSeats = $this->restaurantRepository->getAllReservSeats($startTime, $endTime);

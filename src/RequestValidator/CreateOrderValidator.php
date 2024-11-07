@@ -29,7 +29,7 @@ class CreateOrderValidator
             'room_type' => ['required', ['subset', array_column(RoomType::cases(), 'value')]],
             'checkin_date' => ['required', 'date', ['dateFormat', 'Y-m-d H:i:s'], ['dateAfter', date('Y-m-d H:i:s')]],
             'checkout_date' => ['required', 'date', ['dateFormat', 'Y-m-d H:i:s'], ['dateAfter', date('Y-m-d H:i:s')]],
-            'seats' => ['numeric'], // add a validation for max and min
+            'seats' => ['numeric'], // add a validation for max and min, currently its returning string
             'table_setting' => [['requiredWith', 'seats'], ['subset', array_column(TableSetting::cases(), 'value')]],
             'restaurant_date' => [['requiredWith', 'seats'], 'date', ['dateFormat', 'Y-m-d H:i:s'], ['dateAfter', $data['checkin_date']], ['dateBefore', $data['checkout_date']]],
             'name' => ['required'],
@@ -47,11 +47,11 @@ class CreateOrderValidator
         }
     }
 
-    public function errorBag():array {
+    protected function errorBag():array {
         return $this->errors;
     }
 
-    public function isFullyBooked(string $roomType, string $date): bool {
+    private function isFullyBooked(string $roomType, string $date): bool {
         $bookedRooms = $this->roomRepository->getAvailability($roomType, $date);
 
         $numbersOfRoom = match($roomType) {

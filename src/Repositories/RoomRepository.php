@@ -47,7 +47,7 @@ class RoomRepository extends BaseRepository
         $stmt = $this->database->prepare('
             SELECT order.id, name, amount, room_type, checkin_date, checkout_date
             FROM room
-            JOIN `order`
+            INNER JOIN `order`
             ON room.order_id = order.id
             WHERE order_id = :id
             ');

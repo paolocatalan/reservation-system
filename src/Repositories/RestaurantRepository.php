@@ -47,7 +47,7 @@ class RestaurantRepository extends BaseRepository
         $stmt = $this->database->prepare('
             SELECT order.id, name, amount, seats, table_setting, reservation_date
             FROM restaurant
-            JOIN `order`
+            INNER JOIN `order`
             ON restaurant.order_id = order.id
             WHERE order_id = :id
             ');
