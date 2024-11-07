@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Controller\OrderController;
-use App\Controller\RestaurantController;
 use App\Middleware\AddJsonResponseHeader;
 use DI\ContainerBuilder;
 use Dotenv\Dotenv;
@@ -36,8 +34,7 @@ $errorHandler->forceContentType('application/json');
 
 $app->add(new AddJsonResponseHeader);
 
-$app->post('/api/book', [OrderController::class, 'store']);
-
-$app->post('/api/restaurant', [RestaurantController::class, 'store']);
+$router = require dirname(__DIR__) . '/src/Routes.php';
+$router($app, $container);
 
 $app->run();
