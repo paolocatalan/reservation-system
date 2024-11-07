@@ -43,7 +43,7 @@ class StoreReservTableValidator
 
     }
 
-    protected function errorBag(): array {
+    public function errorBag(): array {
         return $this->errors;
     }
 

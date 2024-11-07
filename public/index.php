@@ -2,7 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Controller\ProductController;
+use App\Controller\OrderController;
+use App\Controller\RestaurantController;
 use App\Middleware\AddJsonResponseHeader;
 use DI\ContainerBuilder;
 use Dotenv\Dotenv;
@@ -35,8 +36,8 @@ $errorHandler->forceContentType('application/json');
 
 $app->add(new AddJsonResponseHeader);
 
-$app->get('/api/products', [ProductController::class, 'index']);
+$app->post('/api/book', [OrderController::class, 'store']);
 
-$app->get('/api/products/{productId:[0-9]+}', [ProductController::class, 'show']);
+$app->post('/api/restaurant', [RestaurantController::class, 'store']);
 
 $app->run();
