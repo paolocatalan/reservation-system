@@ -23,7 +23,7 @@ class OrderController
 
     public function index(Request $request, Response $response): Response
     {
-        $data = $this->orderRepository->getAll();
+        $data = $this->orderRepository->getAllReservation();
 
         $body = json_encode($data);
 
@@ -34,7 +34,7 @@ class OrderController
 
     public function show(Request $request, Response $response, string $id): Response
     {
-        $data = $this->orderRepository->getById((int) $id); 
+        $data = $this->orderRepository->getByOrderId((int) $id); 
 
         if ($data === false) {
             throw new HttpNotFoundException($request, message: 'order not found');
