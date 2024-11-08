@@ -13,7 +13,7 @@ class RoomController
 {
     public function __construct(
         private RoomRepository $repository
-    ) { }
+    ) {}
 
     public function index(Request $request, Response $response): Response
     {
