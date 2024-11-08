@@ -16,7 +16,7 @@ class ReservationService
         private OrderRepository $orderRepository,
         private RestaurantRepository $restaurantRepository,
         private RoomRepository $roomRepository, 
-    ) { }
+    ) {}
 
     public function add(array $order, int $invoiceId): int 
     {
@@ -27,7 +27,7 @@ class ReservationService
 
             $this->roomRepository->create($order, $orderId);
 
-            if ($order['table_setting']) {
+            if ($order['seats']) {
                 $this->restaurantRepository->create($order, $orderId);
             }
 

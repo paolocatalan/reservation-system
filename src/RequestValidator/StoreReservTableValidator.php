@@ -53,7 +53,6 @@ class StoreReservTableValidator
         $bookedSeats = $this->restaurantRepository->getAllReservSeats($startTime, $endTime);
 
         $numberOfSeats = 0;
-
         foreach ($bookedSeats as $item) {
             $numberOfSeats += $item['seats'];
         }

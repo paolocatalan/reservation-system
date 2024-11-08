@@ -47,11 +47,12 @@ class CreateOrderValidator
         }
     }
 
-    public function errorBag():array {
+    public function errorBag(): array {
         return $this->errors;
     }
 
-    private function isFullyBooked(string $roomType, string $date): bool {
+    private function isFullyBooked(string $roomType, string $date): bool
+    {
         $bookedRooms = $this->roomRepository->getAvailability($roomType, $date);
 
         $numbersOfRoom = match($roomType) {

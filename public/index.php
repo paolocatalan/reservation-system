@@ -21,20 +21,15 @@ AppFactory::setContainer($container);
 $app = AppFactory::create();
 
 $app->addBodyParsingMiddleware();
-
 $collector = $app->getRouteCollector();
-
 $collector->setDefaultInvocationStrategy(new RequestResponseArgs);
 
 $errorMiddlleware = $app->addErrorMiddleware(true, true, true);
-
 $errorHandler = $errorMiddlleware->getDefaultErrorHandler();
-
 $errorHandler->forceContentType('application/json');
-
 $app->add(new AddJsonResponseHeader);
 
 $router = require dirname(__DIR__) . '/src/Routes.php';
-$router($app, $container);
+$router($app);
 
 $app->run();
