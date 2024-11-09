@@ -16,7 +16,6 @@ return function(App $app, Container $container) {
     $errorHandler = $errorMiddlleware->getDefaultErrorHandler();
     $errorHandler->forceContentType('application/json');
 
-
     $app->add(new AddJsonResponseHeader);
 
 };
