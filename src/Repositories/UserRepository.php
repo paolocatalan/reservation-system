@@ -28,7 +28,7 @@ class UserRepository extends BaseRepository
 
     public function getByEmail(string $email): array|bool
     {
-        $stmt = $this->database->prepare('SELECT email FROM user WHERE email = ?');
+        $stmt = $this->database->prepare('SELECT * FROM user WHERE email = ?');
 
         $stmt->execute([$email]);
 

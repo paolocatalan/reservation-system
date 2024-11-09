@@ -7,32 +7,30 @@ namespace App\Controller;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use App\Repositories\UserRepository;
-use App\RequestValidator\UserRegistrationValidator;
+use App\RequestValidator\UserLoginValidator;
 
-class AuthController
+class AuthSessionController
 {
     public function __construct(
         protected UserRepository $userRepository,
-        protected UserRegistrationValidator $userRegistrationValidator
+        protected UserLoginValidator $userLoginValidator
     ) {}
 
-    public function store(Request $request, Response $response): Response
+    public function store(Request $request, Response $response): Response 
     { 
         $data = (array) $request->getParsedBody();
 
-        $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 12]);
-
-        $validated = $this->userRegistrationValidator->validate($data);
+        $validated = $this->userLoginValidator->validate($data);
 
         if (!$validated) {
-            $body = json_encode($this->userRegistrationValidator->errorBag());
+            $body = json_encode($this->userLoginValidator->errorBag());
             $response->getBody()->write($body);
             return $response->withStatus(422);
         }
 
-        $userId = $this->userRepository->create($data);
+        $user = $this->userRepository->getByEmail($validated['email']);
 
-        $payload = json_encode($userId);
+        $payload = json_encode($user);
 
         $response->getBody()->write($payload);
 

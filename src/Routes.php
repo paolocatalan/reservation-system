@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Controller\AuthController;
+use App\Controller\AuthSessionController;
 use Slim\App;
 use App\Controller\OrderController;
 use App\Controller\RestaurantController;
@@ -13,4 +14,5 @@ return function(App $app) {
     $app->post('/api/book', [OrderController::class, 'store']);
     $app->post('/api/restaurant', [RestaurantController::class, 'store']);
     $app->post('/api/register', [AuthController::class, 'store']);
+    $app->post('/api/login', [AuthSessionController::class, 'store']);
 };
