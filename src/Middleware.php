@@ -18,6 +18,5 @@ return function(App $app, Container $container) {
     $errorHandler->forceContentType('application/json');
 
     $app->add(new AddJsonResponseHeader);
-    $app->add(new AuthMiddleware);
 
 };

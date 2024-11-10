@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Repositories\RoomRepository;
+use App\Traits\HttpResponses;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
-use Slim\Exception\HttpNotFoundException;
 
 class RoomController
 {
+    use HttpResponses;
+
     public function __construct(
         private RoomRepository $repository
     ) {}
@@ -31,7 +33,7 @@ class RoomController
         $data = $this->repository->getById((int) $id); 
 
         if ($data === false) {
-            throw new HttpNotFoundException($request, message: 'product not found');
+            return $this->error('Booking not found', null, 404);
         }
 
         $body = json_encode($data);

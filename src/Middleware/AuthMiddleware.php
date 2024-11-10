@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Middleware;
 
+use App\Traits\HttpResponses;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\Key;
 use Psr\Http\Message\ResponseInterface;
@@ -14,19 +15,14 @@ use UnexpectedValueException;
 
 class AuthMiddleware implements MiddlewareInterface
 {
+    use HttpResponses;
+
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $authHeader = $request->getHeader('Authorization');
 
         if (!$authHeader) {
-            $response = new \Slim\Psr7\Response();
-            $payload = json_encode([
-                'message' => 'Unauthorized.'
-            ]);
-
-            $response->getBody()->write($payload);
-            return $response
-                ->withStatus(401);
+            return $this->error('Unauthorized.', null, 403);
         }
 
         $token = preg_replace('/^Bearer\s*/', '', $authHeader[0]);
@@ -35,15 +31,7 @@ class AuthMiddleware implements MiddlewareInterface
         try {
             $decode = \Firebase\JWT\JWT::decode($token, new Key($key, 'HS256'));
         } catch (UnexpectedValueException | ExpiredException $e) {
-            $response = new \Slim\Psr7\Response();
-            $payload = json_encode([
-                'message' => $e->getMessage()
-            ]);
-
-            $response->getBody()->write($payload);
-            return $response
-                ->withStatus(401);
-
+            return $this->error($e->getMessage(), null, 401);
         }
 
         $request = $request->withAttribute('auth', $decode);

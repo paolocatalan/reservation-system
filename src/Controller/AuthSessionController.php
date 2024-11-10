@@ -8,9 +8,12 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use App\Repositories\UserRepository;
 use App\RequestValidator\UserLoginValidator;
+use App\Traits\HttpResponses;
 
 class AuthSessionController
 {
+    use HttpResponses;
+
     public function __construct(
         protected UserRepository $userRepository,
         protected UserLoginValidator $userLoginValidator
@@ -47,11 +50,7 @@ class AuthSessionController
         $jwt = \Firebase\JWT\JWT::encode($payload, $key, 'HS256');
 
         $auth = [
-            'id' => $user['id'],
-            'name' => $user['name'],
             'email' =>  $user['email'],
-            'created_at' => $user['created_at'],
-            'updated_at' => $user['updated_at'],
             'token' => $jwt
         ];
 
@@ -62,15 +61,4 @@ class AuthSessionController
         return $response;
     }
 
-    public function index(Request $request, Response $response): Response
-    {
-        $data = $request->getAttribute('auth');
-
-        $payload = json_encode($data);
-
-        $response->getBody()->write($payload);
-
-        return $response;
-
-    }
 }

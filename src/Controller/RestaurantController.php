@@ -9,9 +9,12 @@ use App\Services\InvoiceService;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use App\Services\RestaurantService;
+use App\Traits\HttpResponses;
 
 class RestaurantController
 {
+    use HttpResponses;
+
     public function __construct(
         private InvoiceService $invoiceService,
         private RestaurantService $restaurantService,
@@ -23,10 +26,7 @@ class RestaurantController
         $validated = $this->validator->validate($request->getParsedBody());
 
         if (!$validated) {
-            $body = json_encode($this->validator->errorBag());
-            $response->getBody()->write($body);
-
-            return $response->withStatus(422);
+            return $this->error(null, $this->validator->errorBag(), 422);
         } 
 
         $invoice = $this->invoiceService->process($validated);

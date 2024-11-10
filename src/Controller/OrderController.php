@@ -8,12 +8,15 @@ use App\Repositories\OrderRepository;
 use App\RequestValidator\CreateOrderValidator;
 use App\Services\InvoiceService;
 use App\Services\ReservationService;
+use App\Traits\HttpResponses;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Exception\HttpNotFoundException;
 
 class OrderController
 {
+    use HttpResponses;
+
     public function __construct(
         private OrderRepository $orderRepository,
         private InvoiceService $invoiceService,
@@ -37,7 +40,7 @@ class OrderController
         $data = $this->orderRepository->getByOrderId((int) $id); 
 
         if ($data === false) {
-            throw new HttpNotFoundException($request, message: 'order not found');
+            $this->error('Order not found', null, 404);
         }
 
         $body = json_encode($data);
@@ -52,10 +55,7 @@ class OrderController
         $validated = $this->validator->validate($request->getParsedBody());
  
         if (!$validated) {
-            $body = json_encode($this->validator->errorBag());
-            $response->getBody()->write($body);
-
-            return $response->withStatus(422);
+            return $this->error(null, $this->validator->errorBag(), 422);
         } 
 
         $invoice = $this->invoiceService->process($validated);

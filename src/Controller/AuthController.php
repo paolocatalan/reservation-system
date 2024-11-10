@@ -8,9 +8,12 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use App\Repositories\UserRepository;
 use App\RequestValidator\UserRegistrationValidator;
+use App\Traits\HttpResponses;
 
 class AuthController
 {
+    use HttpResponses;
+
     public function __construct(
         protected UserRepository $userRepository,
         protected UserRegistrationValidator $userRegistrationValidator
@@ -25,9 +28,7 @@ class AuthController
         $validated = $this->userRegistrationValidator->validate($data);
 
         if (!$validated) {
-            $body = json_encode($this->userRegistrationValidator->errorBag());
-            $response->getBody()->write($body);
-            return $response->withStatus(422);
+           return $this->error(null, $this->userRegistrationValidator->errorBag(), 422);
         }
 
         $userId = $this->userRepository->create($data);
