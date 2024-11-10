@@ -7,6 +7,7 @@ use App\Controller\AuthSessionController;
 use Slim\App;
 use App\Controller\OrderController;
 use App\Controller\RestaurantController;
+use App\Middleware\AuthMiddleware;
 
 return function(App $app) {
     $app->get('/api/orders', [OrderController::class, 'index']);
@@ -15,4 +16,6 @@ return function(App $app) {
     $app->post('/api/restaurant', [RestaurantController::class, 'store']);
     $app->post('/api/register', [AuthController::class, 'store']);
     $app->post('/api/login', [AuthSessionController::class, 'store']);
+
+    $app->get('/auth', [AuthSessionController::class, 'index'])->add(AuthMiddleware::class);
 };

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use DI\Container;
 use Slim\App;
 use App\Middleware\AddJsonResponseHeader;
+use App\Middleware\AuthMiddleware;
 use Slim\Handlers\Strategies\RequestResponseArgs;
 
 return function(App $app, Container $container) {
@@ -17,5 +18,6 @@ return function(App $app, Container $container) {
     $errorHandler->forceContentType('application/json');
 
     $app->add(new AddJsonResponseHeader);
+    $app->add(new AuthMiddleware);
 
 };
