@@ -26,7 +26,7 @@ class RestaurantController
         $validated = $this->validator->validate($request->getParsedBody());
 
         if (!$validated) {
-            return $this->error(null, $this->validator->errorBag(), 422);
+            return $this->error('There was a problem with your submission.', $this->validator->errorBag(), 422);
         } 
 
         $invoice = $this->invoiceService->process($validated);

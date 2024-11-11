@@ -26,9 +26,7 @@ class AuthSessionController
         $validated = $this->userLoginValidator->validate($data);
 
         if (!$validated) {
-            $body = json_encode($this->userLoginValidator->errorBag());
-            $response->getBody()->write($body);
-            return $response->withStatus(422);
+            return $this->error('There was a problem with your submission.', $this->userLoginValidator->errorBag(), 422);
         }
 
         $user = $this->userRepository->getByEmail($validated['email']);
