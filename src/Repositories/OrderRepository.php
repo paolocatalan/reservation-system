@@ -61,10 +61,10 @@ class OrderRepository extends BaseRepository
         return $order ? $order : [];
     }
 
-    public function getAllReservation(): array
+    public function fetchAllFutureDates(): array
     {
         $stmt = $this->database->query('
-            SELECT order.id, name, amount, room_type, checkin_date, checkout_date, seats, table_setting, reservation_date 
+            SELECT order.id, invoice_id, name, amount, room_type, checkin_date, checkout_date, seats, table_setting, reservation_date 
             FROM `order`
             LEFT JOIN room
             ON order.id = room.order_id

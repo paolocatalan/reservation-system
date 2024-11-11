@@ -40,7 +40,7 @@ class UserLoginValidator
         return $this->errors;
     }
 
-    public function invalidCredentials(string $email, $password): bool {
+    private function invalidCredentials(string $email, $password): bool {
         $user = $this->userRepository->getByEmail($email);
 
         if (!$user || password_verify($password, $user['password'])) {

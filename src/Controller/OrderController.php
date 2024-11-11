@@ -25,7 +25,7 @@ class OrderController
 
     public function index(Request $request, Response $response): Response
     {
-        $data = $this->orderRepository->getAll();
+        $data = $this->orderRepository->fetchAllFutureDates();
 
         $body = json_encode($data);
 

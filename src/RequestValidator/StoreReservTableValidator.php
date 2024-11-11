@@ -30,7 +30,7 @@ class StoreReservTableValidator
             'credit_card' => ['required']
         ]);
 
-        if ($data['restaurant_date']) {
+        if ($data['seats']) {
             $validator->rule(function($field, $value, $params, $fields) use ($data) {
                 return $this->isNotAvailable($value, (int) $data['seats']); 
             }, 'restaurant_date')->message('No available seat for your date.');

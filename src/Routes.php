@@ -3,21 +3,25 @@
 declare(strict_types=1);
 
 use App\Controller\AuthController;
-use App\Controller\AuthSessionController;
-use Slim\App;
+use App\Controller\FetchOrderController;
 use App\Controller\OrderController;
 use App\Controller\RestaurantController;
+use App\Controller\SessionController;
 use App\Middleware\AuthMiddleware;
+use Slim\App;
+use Slim\Routing\RouteCollectorProxy;
 
 return function(App $app) {
-    $app->get('/api/orders', [OrderController::class, 'index'])->add(AuthMiddleware::class);
-    $app->get('/api/orders/{orderId:[0-9]+}', [OrderController::class, 'show'])->add(AuthMiddleware::class);
-    $app->post('/api/book', [OrderController::class, 'store']);
-    $app->post('/api/restaurant', [RestaurantController::class, 'store']);
-    $app->post('/api/register', [AuthController::class, 'store']);
-    $app->post('/api/login', [AuthSessionController::class, 'store']);
+    $app->group('/api', function (RouteCollectorProxy $group) {
+        $group->get('/orders', [OrderController::class, 'index'])->add(new AuthMiddleware());
+        $group->get('/orders/{orderId:[0-9]+}', [OrderController::class, 'show'])->add(new AuthMiddleware());
+        $group->post('/orders', [OrderController::class, 'store']);
 
-    $app->get('/api/paginate', [OrderController::class, 'index']);
+        $group->get('/orders/dates', FetchOrderController::class)->add(new AuthMiddleware());
+        $group->post('/orders/dinnings', [RestaurantController::class, 'store']);
 
-    $app->get('/seats', [RestaurantController::class, 'pull']);
+    });
+
+    $app->post('/register', [AuthController::class, 'store']);
+    $app->post('/login', [SessionController::class, 'store']);
 };
