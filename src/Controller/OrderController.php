@@ -11,7 +11,6 @@ use App\Services\ReservationService;
 use App\Traits\HttpResponses;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
-use Slim\Exception\HttpNotFoundException;
 
 class OrderController
 {
@@ -26,7 +25,7 @@ class OrderController
 
     public function index(Request $request, Response $response): Response
     {
-        $data = $this->orderRepository->getAllReservation();
+        $data = $this->orderRepository->getAll();
 
         $body = json_encode($data);
 
@@ -55,7 +54,7 @@ class OrderController
         $validated = $this->validator->validate($request->getParsedBody());
  
         if (!$validated) {
-            return $this->error(null, $this->validator->errorBag(), 422);
+            return $this->error('There was a problem with your submission.', $this->validator->errorBag(), 422);
         } 
 
         $invoice = $this->invoiceService->process($validated);

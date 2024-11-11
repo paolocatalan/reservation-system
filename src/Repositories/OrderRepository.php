@@ -8,7 +8,7 @@ class OrderRepository extends BaseRepository
 {
     public function getAll(): array
     {
-        $stmt = $this->database->query('SELECT * FROM `order`'); 
+        $stmt = $this->database->query('SELECT * FROM `order`');
 
         return $stmt->fetchAll();
     } 

@@ -6,6 +6,7 @@ namespace App\RequestValidator;
 
 use App\Enums\RoomType;
 use App\Enums\TableSetting;
+use App\Repositories\RestaurantRepository;
 use App\Repositories\RoomRepository;
 use Valitron\Validator;
 
@@ -14,7 +15,8 @@ class CreateOrderValidator
     protected $errors = [];
 
     public function __construct(
-        protected RoomRepository $roomRepository
+        protected RoomRepository $roomRepository,
+        protected RestaurantRepository $restaurantRepository
     ) {}
 
     public function validate(array $data): array|bool
@@ -24,6 +26,10 @@ class CreateOrderValidator
         $validator->rule(function($field, $value, $params, $fields) use ($data) {
             return $this->isFullyBooked($data['room_type'], $value); 
         }, 'checkin_date')->message($data['room_type'] . ' is fully booked on these dates.');
+
+        $validator->rule(function($field, $value, $params, $fields) use ($data) {
+            return $this->isNotAvailable($value, (int) $data['seats']); 
+        }, 'restaurant_date')->message('No available seat for your date.');
 
         $validator->mapFieldsRules([
             'room_type' => ['required', ['subset', array_column(RoomType::cases(), 'value')]],
@@ -67,4 +73,22 @@ class CreateOrderValidator
 
         return true;
     }
+
+    private function isNotAvailable(string $startTime, int $seats): bool {
+        $endTime = date('Y-m-d H:i:s', strtotime('+8 hours', strtotime($startTime)));
+
+        $bookedSeats = $this->restaurantRepository->getAllReservSeats($startTime, $endTime);
+
+        $numberOfSeats = 0;
+        foreach ($bookedSeats as $item) {
+            $numberOfSeats += $item['seats'];
+        }
+
+        if ($numberOfSeats >= 20 + $seats) {
+            return false;
+        }
+
+        return true;
+    }
+
 }

@@ -18,7 +18,7 @@ class RestaurantController
     public function __construct(
         private InvoiceService $invoiceService,
         private RestaurantService $restaurantService,
-        private StoreReservTableValidator $validator
+        private StoreReservTableValidator $validator,
     ) {}
 
     public function store(Request $request, Response $response): Response

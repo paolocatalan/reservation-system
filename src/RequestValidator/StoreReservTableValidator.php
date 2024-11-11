@@ -20,8 +20,8 @@ class StoreReservTableValidator
     {
         $validator = new Validator($data);
 
-        $validator->rule(function($field, $value, $params, $fields) {
-            return $this->isNotAvailable($value); 
+        $validator->rule(function($field, $value, $params, $fields) use ($data) {
+            return $this->isNotAvailable($value, (int) $data['seats']); 
         }, 'restaurant_date')->message('No available seat for your date.');
 
         $validator->mapFieldsRules([
@@ -47,7 +47,7 @@ class StoreReservTableValidator
         return $this->errors;
     }
 
-    private function isNotAvailable(string $startTime): bool {
+    private function isNotAvailable(string $startTime, int $seats): bool {
         $endTime = date('Y-m-d H:i:s', strtotime('+8 hours', strtotime($startTime)));
 
         $bookedSeats = $this->restaurantRepository->getAllReservSeats($startTime, $endTime);
@@ -57,10 +57,11 @@ class StoreReservTableValidator
             $numberOfSeats += $item['seats'];
         }
 
-        if ($numberOfSeats >= 20) {
+        if ($numberOfSeats >= 20 + $seats) {
             return false;
         }
 
         return true;
     }
+
 }
