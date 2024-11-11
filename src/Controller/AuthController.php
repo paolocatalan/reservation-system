@@ -28,7 +28,7 @@ class AuthController
         $validated = $this->userRegistrationValidator->validate($data);
 
         if (!$validated) {
-           return $this->error(null, $this->userRegistrationValidator->errorBag(), 422);
+           return $this->error('There was a problem with your submission.', $this->userRegistrationValidator->errorBag(), 422);
         }
 
         $userId = $this->userRepository->create($data);

@@ -20,10 +20,6 @@ class StoreReservTableValidator
     {
         $validator = new Validator($data);
 
-        $validator->rule(function($field, $value, $params, $fields) use ($data) {
-            return $this->isNotAvailable($value, (int) $data['seats']); 
-        }, 'restaurant_date')->message('No available seat for your date.');
-
         $validator->mapFieldsRules([
             'seats' => ['required', 'numeric'], // add a validation for max and min
             'table_setting' => ['required', ['subset', array_column(TableSetting::cases(), 'value')]],
@@ -33,6 +29,12 @@ class StoreReservTableValidator
             'amount' => ['required', 'numeric'],
             'credit_card' => ['required']
         ]);
+
+        if ($data['restaurant_date']) {
+            $validator->rule(function($field, $value, $params, $fields) use ($data) {
+                return $this->isNotAvailable($value, (int) $data['seats']); 
+            }, 'restaurant_date')->message('No available seat for your date.');
+        }
 
         if ($validator->validate()) {
             return $data;
@@ -57,7 +59,7 @@ class StoreReservTableValidator
             $numberOfSeats += $item['seats'];
         }
 
-        if ($numberOfSeats >= 20 + $seats) {
+        if ($numberOfSeats + $seats >= 20) {
             return false;
         }
 

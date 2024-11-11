@@ -23,14 +23,6 @@ class CreateOrderValidator
     {
         $validator = new Validator($data);
 
-        $validator->rule(function($field, $value, $params, $fields) use ($data) {
-            return $this->isFullyBooked($data['room_type'], $value); 
-        }, 'checkin_date')->message($data['room_type'] . ' is fully booked on these dates.');
-
-        $validator->rule(function($field, $value, $params, $fields) use ($data) {
-            return $this->isNotAvailable($value, (int) $data['seats']); 
-        }, 'restaurant_date')->message('No available seat for your date.');
-
         $validator->mapFieldsRules([
             'room_type' => ['required', ['subset', array_column(RoomType::cases(), 'value')]],
             'checkin_date' => ['required', 'date', ['dateFormat', 'Y-m-d H:i:s'], ['dateAfter', date('Y-m-d H:i:s')]],
@@ -43,6 +35,18 @@ class CreateOrderValidator
             'amount' => ['required', 'numeric'],
             'credit_card' => ['required']
         ]);
+
+        if ($data['room_type']) {
+            $validator->rule(function($field, $value, $params, $fields) use ($data) {
+                return $this->isFullyBooked($data['room_type'], $value); 
+            }, 'checkin_date')->message($data['room_type'] . ' is fully booked on these dates.');
+        }
+
+        if ($data['restaurant_date']) {
+            $validator->rule(function($field, $value, $params, $fields) use ($data) {
+                return $this->isNotAvailable($value, (int) $data['seats']); 
+            }, 'restaurant_date')->message('No available seat for your date.');
+        }
 
         if ($validator->validate()) {
             // we should return the validated inputs not the data from the agruments
@@ -84,7 +88,7 @@ class CreateOrderValidator
             $numberOfSeats += $item['seats'];
         }
 
-        if ($numberOfSeats >= 20 + $seats) {
+        if ($numberOfSeats + $seats >= 20) {
             return false;
         }
 
