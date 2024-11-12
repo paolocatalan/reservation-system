@@ -51,9 +51,10 @@ class RoomRepository extends BaseRepository
         $stmt = $this->database->prepare("
             SELECT order_id, invoice_id, name, room_type, checkin_date, checkout_date
             FROM room
-            RIGHT JOIN `order`
+            LEFT JOIN `order`
             ON room.order_id = order.id 
-            WHERE room.checkin_date IS NOT NULL AND order.name LIKE :search_name
+            WHERE order.name LIKE :search_name
+            ORDER BY checkin_date DESC
             ");
 
         $stmt->bindValue(':search_name', "%$searchName%");

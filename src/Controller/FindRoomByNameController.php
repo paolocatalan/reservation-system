@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Repositories\RoomRepository;
+use App\Traits\HttpResponses;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
 class FindRoomByNameController
 {
+    use HttpResponses;
+
     public function __construct(
         private RoomRepository $roomRepository
     ) {}
@@ -18,7 +21,11 @@ class FindRoomByNameController
     {
         $data = $request->getParsedBody();
 
-        $results = $this->roomRepository->searchByName($data['search']);
+        $results = $this->roomRepository->searchByName($data['name']);
+
+        if (empty($results)) {
+           return $this->success('No results found.', null, 200);
+        }
 
         $payload = json_encode($results);
 

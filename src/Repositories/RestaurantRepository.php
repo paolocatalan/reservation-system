@@ -46,14 +46,15 @@ class RestaurantRepository extends BaseRepository
         return (int) $this->database->lastInsertId();
     }
 
-    public function searchByName(string $searchName): array|bool
+    public function searchByName(string $searchName): array
     {
         $stmt = $this->database->prepare("
             SELECT order_id, invoice_id, amount, name, seats, table_setting, reservation_date
             FROM restaurant
-            RIGHT JOIN `order`
+            LEFT JOIN `order`
             ON restaurant.order_id = order.id 
-            WHERE restaurant.reservation_date IS NOT NULL AND order.name LIKE :search_name
+            WHERE order.name LIKE :search_name
+            ORDER BY reservation_date DESC
             ");
 
         $stmt->bindValue(':search_name', "%$searchName%");

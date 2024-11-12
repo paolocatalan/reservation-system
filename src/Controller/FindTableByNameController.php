@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Repositories\RestaurantRepository;
+use App\Traits\HttpResponses;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
 class FindTableByNameController
 {
+    use HttpResponses;
+
     public function __construct(
         private RestaurantRepository $restaurantRepository
     ) {}
@@ -18,7 +21,11 @@ class FindTableByNameController
     {
         $data = $request->getParsedBody();
 
-        $results = $this->restaurantRepository->searchByName($data['search']);
+        $results = $this->restaurantRepository->searchByName($data['name']);
+
+        if (empty($results)) {
+           return $this->success('No results found.', null, 200);
+        }
 
         $payload = json_encode($results);
 
