@@ -13,11 +13,15 @@ class RestaurantRepository extends BaseRepository
         return $stmt->fetchAll();
     } 
 
-    public function getById(int $id): array|bool
+    public function getByOrderId(int $id): array|bool
     {
-        $query = 'SELECT * FROM restaurant WHERE id = :id';
-
-        $stmt = $this->database->prepare($query);
+        $stmt = $this->database->prepare('
+            SELECT order.id, name, amount, seats, table_setting, reservation_date
+            FROM restaurant
+            INNER JOIN `order`
+            ON restaurant.order_id = order.id
+            WHERE order_id = :id
+            ');
 
         $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
 
@@ -42,24 +46,7 @@ class RestaurantRepository extends BaseRepository
         return (int) $this->database->lastInsertId();
     }
 
-    public function getByOrderId(int $id): array|bool
-    {
-        $stmt = $this->database->prepare('
-            SELECT order.id, name, amount, seats, table_setting, reservation_date
-            FROM restaurant
-            INNER JOIN `order`
-            ON restaurant.order_id = order.id
-            WHERE order_id = :id
-            ');
-
-        $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
-
-        $stmt->execute();
-
-        return $stmt->fetch();
-    }
-
-    public function searchByOrderName(string $searchName): array|bool
+    public function searchByName(string $searchName): array|bool
     {
         $stmt = $this->database->prepare("
             SELECT order_id, invoice_id, amount, name, seats, table_setting, reservation_date
@@ -76,22 +63,7 @@ class RestaurantRepository extends BaseRepository
         return $stmt->fetchAll();
     }
 
-
-
-    public function getAllReservation(): array
-    {
-        $stmt = $this->database->query('
-            SELECT order.id, invoice_id, name, amount, seats, table_setting, reservation_date
-            FROM `order`
-            RIGHT JOIN restaurant
-            ON order.id = restaurant.order_id
-            WHERE reservation_date > NOW() 
-            ');
-
-        return $stmt->fetchAll();
-    }
-
-    public function getAllReservSeats(string $startTime, string $endTime): array
+    public function getReseverdSeats(string $startTime, string $endTime): array
     {
         $stmt = $this->database->prepare('
             SELECT seats
@@ -107,5 +79,18 @@ class RestaurantRepository extends BaseRepository
         return $stmt->fetchAll();
     }
 
+    // not in use
 
+    public function getAllReservation(): array
+    {
+        $stmt = $this->database->query('
+            SELECT order.id, invoice_id, name, amount, seats, table_setting, reservation_date
+            FROM `order`
+            RIGHT JOIN restaurant
+            ON order.id = restaurant.order_id
+            WHERE reservation_date > NOW() 
+            ');
+
+        return $stmt->fetchAll();
+    }
 }

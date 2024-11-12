@@ -30,9 +30,9 @@ class RoomController
 
     public function search(Request $request, Response $response): Response
     {
-        $queryParam = $request->getParsedBody();
+        $data = $request->getParsedBody();
 
-        $results = $this->repository->searchByOrderName($queryParam['search']);
+        $results = $this->repository->searchByName($data['search']);
 
         $payload = json_encode($results);
 

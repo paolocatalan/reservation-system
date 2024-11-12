@@ -23,6 +23,17 @@ class RestaurantController
         private StoreReservTableValidator $validator,
     ) {}
 
+    public function index(Request $request, Response $response): Response
+    {
+        $data = $this->restaurantRepository->getAllReservation();
+
+        $body = json_encode($data);
+
+        $response->getBody()->write($body);
+
+        return $response;
+    }
+
     public function store(Request $request, Response $response): Response
     {
         $validated = $this->validator->validate($request->getParsedBody());
@@ -48,9 +59,9 @@ class RestaurantController
 
     public function search(Request $request, Response $response): Response
     {
-        $queryParam = $request->getParsedBody();
+        $data = $request->getParsedBody();
 
-        $results = $this->restaurantRepository->searchByOrderName($queryParam['search']);
+        $results = $this->restaurantRepository->searchByName($data['search']);
 
         $payload = json_encode($results);
 

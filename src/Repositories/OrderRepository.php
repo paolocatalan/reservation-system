@@ -13,35 +13,6 @@ class OrderRepository extends BaseRepository
         return $stmt->fetchAll();
     } 
 
-    public function getById(int $id): array|bool
-    {
-        $query = 'SELECT * FROM `order` WHERE id = :id';
-
-        $stmt = $this->database->prepare($query);
-
-        $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
-
-        $stmt->execute();
-
-        return $stmt->fetch();
-    }
-
-    public function create(array $order, int $invoiceId): int
-    {
-        $query = 'INSERT INTO `order` (invoice_id, amount, name, email, created_at, updated_at) VALUES (:invoice_id, :amount, :name, :email, NOW(), NOW())';
-
-        $stmt = $this->database->prepare($query);
-
-        $stmt->bindValue(':invoice_id', $invoiceId);
-        $stmt->bindValue(':amount', $order['amount']);
-        $stmt->bindValue(':name', $order['name']);
-        $stmt->bindValue(':email', $order['email']);
-
-        $stmt->execute();
-
-        return (int) $this->database->lastInsertId();
-    }
-    
     public function getByOrderId(int $id): array
     {
         $stmt = $this->database->prepare('
@@ -61,7 +32,23 @@ class OrderRepository extends BaseRepository
         return $order ? $order : [];
     }
 
-    public function fetchAllFutureDates(): array
+    public function create(array $order, int $invoiceId): int
+    {
+        $query = 'INSERT INTO `order` (invoice_id, amount, name, email, created_at, updated_at) VALUES (:invoice_id, :amount, :name, :email, NOW(), NOW())';
+
+        $stmt = $this->database->prepare($query);
+
+        $stmt->bindValue(':invoice_id', $invoiceId);
+        $stmt->bindValue(':amount', $order['amount']);
+        $stmt->bindValue(':name', $order['name']);
+        $stmt->bindValue(':email', $order['email']);
+
+        $stmt->execute();
+
+        return (int) $this->database->lastInsertId();
+    }
+    
+    public function fetchFutureDates(): array
     {
         $stmt = $this->database->query('
             SELECT order.id, invoice_id, name, amount, room_type, checkin_date, checkout_date, seats, table_setting, reservation_date 

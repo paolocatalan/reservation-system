@@ -24,7 +24,8 @@ return function(App $app) {
         $group->post('/orders/rooms/names/', [RoomController::class, 'search'])->add(new AuthMiddleware());
         
         $group->get('/orders/rooms/{type}', [RoomController::class, 'index'])->add(new AuthMiddleware());
-        $group->get('/orders/{date}', FetchOrderController::class)->add(new AuthMiddleware());
+
+        $group->get('/orders/', FetchOrderController::class)->add(new AuthMiddleware());
     });
 
     $app->post('/register', [AuthController::class, 'store']);

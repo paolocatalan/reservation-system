@@ -11,7 +11,5 @@ abstract class BaseRepository
     public function __construct(
         protected Database $database
     ) {}
-
-    abstract public function getById(int $id): array|bool;
 }
 
