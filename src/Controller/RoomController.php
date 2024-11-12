@@ -17,31 +17,28 @@ class RoomController
         private RoomRepository $repository
     ) {}
 
-    public function index(Request $request, Response $response): Response
+    public function index(Request $request, Response $response, string $type): Response
     {
-        $data = $this->repository->getAll();
+        $data = $this->repository->getAll(strtolower($type));
 
-        $body = json_encode($data);
+        $payload = json_encode($data);
 
-        $response->getBody()->write($body);
+        $response->getBody()->write($payload);
 
         return $response;
     }
 
-    public function show(Request $request, Response $response, string $id): Response
+    public function search(Request $request, Response $response): Response
     {
-        $data = $this->repository->getById((int) $id); 
+        $queryParam = $request->getParsedBody();
 
-        if ($data === false) {
-            return $this->error('Booking not found', null, 404);
-        }
+        $results = $this->repository->searchByOrderName($queryParam['search']);
 
-        $body = json_encode($data);
+        $payload = json_encode($results);
 
-        $response->getBody()->write($body);
+        $response->getBody()->write($payload);
 
         return $response;
-
     }
 
 }

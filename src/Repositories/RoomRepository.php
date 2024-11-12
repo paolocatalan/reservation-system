@@ -6,9 +6,15 @@ namespace App\Repositories;
 
 class RoomRepository extends BaseRepository
 {
-    public function getAll(): array
+    public function getAll(string $type): array
     {
-        $stmt = $this->database->query('SELECT * FROM Room'); 
+        $query = 'SELECT * FROM room WHERE room_type = :room_type ORDER BY checkin_date DESC';
+
+        $stmt = $this->database->prepare($query); 
+
+        $stmt->bindValue(':room_type', $type, \PDO::PARAM_STR);
+
+        $stmt->execute();
 
         return $stmt->fetchAll();
     } 
@@ -23,7 +29,7 @@ class RoomRepository extends BaseRepository
 
         $stmt->execute();
 
-        return $stmt->fetch();
+        return $stmt->fetchAll();
     }
 
     public function create(array $order, int $orderId): int 
@@ -57,6 +63,23 @@ class RoomRepository extends BaseRepository
         $stmt->execute();
 
         return $stmt->fetch();
+    }
+
+    public function searchByOrderName(string $searchName): array|bool
+    {
+        $stmt = $this->database->prepare("
+            SELECT order_id, invoice_id, name, room_type, checkin_date, checkout_date
+            FROM room
+            RIGHT JOIN `order`
+            ON room.order_id = order.id 
+            WHERE room.checkin_date IS NOT NULL AND order.name LIKE :search_name
+            ");
+
+        $stmt->bindValue(':search_name', "%$searchName%");
+
+        $stmt->execute();
+
+        return $stmt->fetchAll();
     }
 
     public function getAllReservation(): array

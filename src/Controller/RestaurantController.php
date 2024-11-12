@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Repositories\RestaurantRepository;
 use App\RequestValidator\StoreReservTableValidator;
 use App\Services\InvoiceService;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -18,6 +19,7 @@ class RestaurantController
     public function __construct(
         private InvoiceService $invoiceService,
         private RestaurantService $restaurantService,
+        private RestaurantRepository $restaurantRepository,
         private StoreReservTableValidator $validator,
     ) {}
 
@@ -43,4 +45,19 @@ class RestaurantController
 
         return $response->withStatus(201);
     }
+
+    public function search(Request $request, Response $response): Response
+    {
+        $queryParam = $request->getParsedBody();
+
+        $results = $this->restaurantRepository->searchByOrderName($queryParam['search']);
+
+        $payload = json_encode($results);
+
+        $response->getBody()->write($payload);
+
+        return $response;
+    }
+
+
 }

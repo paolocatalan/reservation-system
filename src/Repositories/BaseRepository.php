@@ -12,8 +12,6 @@ abstract class BaseRepository
         protected Database $database
     ) {}
 
-    abstract public function getAll(): array;
-
     abstract public function getById(int $id): array|bool;
 }
 

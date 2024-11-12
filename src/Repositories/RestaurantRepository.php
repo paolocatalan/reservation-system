@@ -59,6 +59,25 @@ class RestaurantRepository extends BaseRepository
         return $stmt->fetch();
     }
 
+    public function searchByOrderName(string $searchName): array|bool
+    {
+        $stmt = $this->database->prepare("
+            SELECT order_id, invoice_id, amount, name, seats, table_setting, reservation_date
+            FROM restaurant
+            RIGHT JOIN `order`
+            ON restaurant.order_id = order.id 
+            WHERE restaurant.reservation_date IS NOT NULL AND order.name LIKE :search_name
+            ");
+
+        $stmt->bindValue(':search_name', "%$searchName%");
+
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+
+
     public function getAllReservation(): array
     {
         $stmt = $this->database->query('
