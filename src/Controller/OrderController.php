@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Repositories\OrderRepository;
-use App\RequestValidator\CreateOrderValidator;
+use App\RequestValidator\StoreOrderValidator;
 use App\Services\InvoiceService;
 use App\Services\ReservationService;
 use App\Traits\HttpResponses;
@@ -20,7 +20,7 @@ class OrderController
         private OrderRepository $orderRepository,
         private InvoiceService $invoiceService,
         private ReservationService $reservationService,
-        private CreateOrderValidator $validator
+        private StoreOrderValidator $storeOrderValidator
     ) {}
 
     public function index(Request $request, Response $response): Response
@@ -51,10 +51,10 @@ class OrderController
 
     public function store(Request $request, Response $response): Response
     {
-        $validated = $this->validator->validate($request->getParsedBody());
+        $validated = $this->storeOrderValidator->validate($request->getParsedBody());
  
         if (!$validated) {
-            return $this->error('There was a problem with your submission.', $this->validator->errorBag(), 422);
+            return $this->error('There was a problem with your submission.', $this->storeOrderValidator->errorBag(), 422);
         } 
 
         $invoice = $this->invoiceService->process($validated);

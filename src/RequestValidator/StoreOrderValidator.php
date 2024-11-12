@@ -10,7 +10,7 @@ use App\Repositories\RestaurantRepository;
 use App\Repositories\RoomRepository;
 use Valitron\Validator;
 
-class CreateOrderValidator
+class StoreOrderValidator
 {
     protected $errors = [];
 
@@ -81,7 +81,7 @@ class CreateOrderValidator
     private function isNotAvailable(string $startTime, int $seats): bool {
         $endTime = date('Y-m-d H:i:s', strtotime('+8 hours', strtotime($startTime)));
 
-        $bookedSeats = $this->restaurantRepository->getAllReservSeats($startTime, $endTime);
+        $bookedSeats = $this->restaurantRepository->getReseverdSeats($startTime, $endTime);
 
         $numberOfSeats = 0;
         foreach ($bookedSeats as $item) {
