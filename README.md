@@ -6,4 +6,5 @@ The reservation system should allow any user to book a hotel and select a room a
 - User can also reserve a table in the hotel restaurant within the given dates
 - User can also reserve a table without booking a hotel
 - Once selected, user will go through payment gateway service
-- Admin can check the available rooms and restaurant table, and can look up order numbers
+- Admin can check the available rooms and restaurant table, and can look up order numbers, order by dates, and names
+- JWT creation and validation to handle authorization.
