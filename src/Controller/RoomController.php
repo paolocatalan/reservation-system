@@ -19,7 +19,7 @@ class RoomController
 
     public function index(Request $request, Response $response, string $type): Response
     {
-        $data = $this->repository->getAll(strtolower($type));
+        $data = $this->repository->getByRoomType(strtolower($type));
 
         $payload = json_encode($data);
 

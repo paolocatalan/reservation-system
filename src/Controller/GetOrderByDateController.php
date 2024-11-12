@@ -8,7 +8,7 @@ use App\Repositories\OrderRepository;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
-class FetchOrderController
+class GetOrderByDateController
 {
     public function __construct(
         private OrderRepository $orderRepository
@@ -16,11 +16,13 @@ class FetchOrderController
 
     public function __invoke(Request $request, Response $response): Response
     {
-        $data = $this->orderRepository->getAll();
+        $data = $request->getQueryParams();
 
-        $body = json_encode($data);
+        $results = $this->orderRepository->getOrderByDates($data['after'], $data['before']);
 
-        $response->getBody()->write($body);
+        $payload = json_encode($results);
+
+        $response->getBody()->write($payload);
 
         return $response;
 

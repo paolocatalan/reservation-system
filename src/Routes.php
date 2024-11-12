@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Controller\AuthController;
-use App\Controller\FetchOrderController;
+use App\Controller\GetOrderByDateController;
 use App\Controller\OrderController;
 use App\Controller\RestaurantController;
 use App\Controller\RoomController;
@@ -25,7 +25,7 @@ return function(App $app) {
         
         $group->get('/orders/rooms/{type}', [RoomController::class, 'index'])->add(new AuthMiddleware());
 
-        $group->get('/orders/', FetchOrderController::class)->add(new AuthMiddleware());
+        $group->get('/orders/', GetOrderByDateController::class)->add(new AuthMiddleware());
     });
 
     $app->post('/register', [AuthController::class, 'store']);

@@ -47,7 +47,25 @@ class OrderRepository extends BaseRepository
 
         return (int) $this->database->lastInsertId();
     }
-    
+ 
+    public function getOrderByDates($startDate, $endDate): array
+    {
+        $stmt = $this->database->prepare('
+            SELECT order.id, invoice_id, name, amount, room_type, checkin_date, checkout_date
+            FROM `order`
+            LEFT JOIN room
+            ON order.id = room.order_id
+            WHERE checkin_date BETWEEN :start_date AND :end_date
+            ');
+
+        $stmt->bindValue(':start_date', $startDate);
+        $stmt->bindValue(':end_date', $endDate);
+
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+   
     public function fetchFutureDates(): array
     {
         $stmt = $this->database->query('
