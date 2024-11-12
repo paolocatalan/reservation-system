@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Controller\AuthController;
+use App\Controller\FindRoomByNameController;
+use App\Controller\FindTableByNameController;
 use App\Controller\GetOrderByDateController;
 use App\Controller\OrderController;
 use App\Controller\RestaurantController;
@@ -20,14 +22,15 @@ return function(App $app) {
         $group->post('/orders', [OrderController::class, 'store']);
         $group->post('/orders/dinnings', [RestaurantController::class, 'store']);
 
-        $group->post('/orders/dinnings/names/', [RestaurantController::class, 'search'])->add(new AuthMiddleware());
-        $group->post('/orders/rooms/names/', [RoomController::class, 'search'])->add(new AuthMiddleware());
-        
+        $group->post('/orders/dinnings/', FindTableByNameController::class)->add(new AuthMiddleware());
+        $group->post('/orders/rooms/', FindRoomByNameController::class)->add(new AuthMiddleware());
+
         $group->get('/orders/rooms/{type}', [RoomController::class, 'index'])->add(new AuthMiddleware());
 
         $group->get('/orders/', GetOrderByDateController::class)->add(new AuthMiddleware());
-    });
 
-    $app->post('/register', [AuthController::class, 'store']);
-    $app->post('/login', [SessionController::class, 'store']);
+        $group->post('/register', [AuthController::class, 'store']);
+        $group->post('/login', [SessionController::class, 'store']);
+
+    });
 };

@@ -57,18 +57,4 @@ class RestaurantController
         return $response->withStatus(201);
     }
 
-    public function search(Request $request, Response $response): Response
-    {
-        $data = $request->getParsedBody();
-
-        $results = $this->restaurantRepository->searchByName($data['search']);
-
-        $payload = json_encode($results);
-
-        $response->getBody()->write($payload);
-
-        return $response;
-    }
-
-
 }

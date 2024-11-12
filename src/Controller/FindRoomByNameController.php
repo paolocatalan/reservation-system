@@ -5,23 +5,22 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Repositories\RoomRepository;
-use App\Traits\HttpResponses;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
-class RoomController
+class FindRoomByNameController
 {
-    use HttpResponses;
-
     public function __construct(
-        private RoomRepository $repository
+        private RoomRepository $roomRepository
     ) {}
 
-    public function index(Request $request, Response $response, string $type): Response
+    public function __invoke(Request $request, Response $response): Response
     {
-        $data = $this->repository->getByRoomType(strtolower($type));
+        $data = $request->getParsedBody();
 
-        $payload = json_encode($data);
+        $results = $this->roomRepository->searchByName($data['search']);
+
+        $payload = json_encode($results);
 
         $response->getBody()->write($payload);
 
