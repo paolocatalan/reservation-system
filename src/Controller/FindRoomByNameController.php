@@ -19,7 +19,7 @@ class FindRoomByNameController
 
     public function __invoke(Request $request, Response $response): Response
     {
-        $data = $request->getParsedBody();
+        $data = (array) $request->getParsedBody();
 
         $results = $this->roomRepository->searchByName($data['name']);
 

@@ -19,7 +19,7 @@ class FindTableByNameController
 
     public function __invoke(Request $request, Response $response): Response
     {
-        $data = $request->getParsedBody();
+        $data = (array) $request->getParsedBody();
 
         $results = $this->restaurantRepository->searchByName($data['name']);
 

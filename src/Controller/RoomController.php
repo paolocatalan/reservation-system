@@ -21,6 +21,10 @@ class RoomController
     {
         $data = $this->repository->getByRoomType(strtolower($type));
 
+        if (empty($results)) {
+           return $this->success('No results found.', null, 200);
+        }
+
         $payload = json_encode($data);
 
         $response->getBody()->write($payload);
