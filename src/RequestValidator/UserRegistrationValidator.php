@@ -29,6 +29,8 @@ class UserRegistrationValidator
             return ($this->userRepository->getByEmail($value)) ? false : true;
         }, 'email')->message('Email address already exist.');
 
+        $data['password'] = password_hash((string) $data['password'], PASSWORD_BCRYPT, ['cost' => 12]);
+
         if ($validator->validate()) {
             return $data;
         } else {

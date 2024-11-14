@@ -19,13 +19,13 @@ class RoomController
 
     public function index(Request $request, Response $response, string $type): Response
     {
-        $data = $this->repository->getByRoomType(strtolower($type));
+        $results = $this->repository->getByRoomType(strtolower($type));
 
         if (empty($results)) {
            return $this->success('No results found.', null, 200);
         }
 
-        $payload = json_encode($data);
+        $payload = json_encode($results);
 
         $response->getBody()->write($payload);
 

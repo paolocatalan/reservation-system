@@ -31,27 +31,6 @@ class SessionController
 
         $user = $this->userRepository->getByEmail($validated['email']);
 
-        $key = $_ENV['JWT_SECRET_KEY'];
-
-        $payload = [
-            'iss' => 'localhost',
-            'aud' => 'localhost',
-            'iat' => time(),
-            'nbf' => time(),
-            'exp' => time() + (60 * 60),
-            'data' => [
-                'username' => $user['name'],
-                'role' => 'Administrator',
-            ]
-        ];
-
-        $jwt = \Firebase\JWT\JWT::encode($payload, $key, 'HS256');
-
-        $auth = [
-            'email' =>  $user['email'],
-            'token' => $jwt
-        ];
-
         $payload = json_encode($auth);
 
         $response->getBody()->write($payload);

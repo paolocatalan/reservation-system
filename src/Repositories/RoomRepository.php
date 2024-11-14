@@ -96,5 +96,4 @@ class RoomRepository extends BaseRepository
         return $stmt->fetchAll();
     } 
 
-
 }

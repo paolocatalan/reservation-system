@@ -15,11 +15,12 @@ class Database
         private string $host,
         private string $name,
         private string $user,
-        private string $password
+        private string $password,
+        private string $port
     ) 
     {
         try {
-            $this->pdo = new PDO('mysql:host=' . $this->host . ';dbname=' . $this->name, $this->user, $this->password,
+            $this->pdo = new PDO('mysql:host=' . $this->host . ';port=' . $this->port . ';dbname=' . $this->name, $this->user, $this->password,
                 [
                     PDO::ATTR_EMULATE_PREPARES => false,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC

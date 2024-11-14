@@ -16,7 +16,7 @@ use Slim\Routing\RouteCollectorProxy;
 
 return function(App $app) {
     $app->group('/api', function (RouteCollectorProxy $group) {
-        $group->get('/orders', [OrderController::class, 'index'])->add(new AuthMiddleware());
+        $group->get('/orders', [OrderController::class, 'index']);
         $group->get('/orders/{orderId:[0-9]+}', [OrderController::class, 'show'])->add(new AuthMiddleware());
 
         $group->post('/orders', [OrderController::class, 'store']);
