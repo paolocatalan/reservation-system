@@ -15,13 +15,9 @@ class UserRepository extends BaseRepository
 
     public function getById(int $id): array|bool
     {
-        $query = 'SELECT * FROM room WHERE id = :id';
+        $stmt = $this->database->prepare('SELECT * FROM room WHERE id = ?');
 
-        $stmt = $this->database->prepare($query);
-
-        $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
-
-        $stmt->execute();
+        $stmt->execute([$id]);
 
         return $stmt->fetch();
     }

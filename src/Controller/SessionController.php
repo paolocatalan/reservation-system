@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Auth\Authorization;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use App\Repositories\UserRepository;
@@ -16,7 +17,8 @@ class SessionController
 
     public function __construct(
         protected UserRepository $userRepository,
-        protected UserLoginValidator $userLoginValidator
+        protected UserLoginValidator $userLoginValidator,
+        protected Authorization $authorization
     ) {}
 
     public function store(Request $request, Response $response): Response 
@@ -31,7 +33,13 @@ class SessionController
 
         $user = $this->userRepository->getByEmail($validated['email']);
 
-        $payload = json_encode($auth);
+        $payload = json_encode([
+            'user' => $user['name'],
+            'email' => $user['email'],
+            'created_at' => $user['created_at'],
+            'updated_at' => $user['updated_at'],
+            'token' => $this->authorization->token($user['id'])
+        ]);
 
         $response->getBody()->write($payload);
 

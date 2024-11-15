@@ -29,7 +29,7 @@ class UserLoginValidator
         }, 'password')->message('Invalid credentials.');
 
         if ($validator->validate()) {
-            return $data;
+            return ['email' => $data['email']];
         } else {
             $this->errors = $validator->errors();
             return false;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Auth;
 
 use App\Repositories\UserRepository;
+use Firebase\JWT\JWT;
 
 class Authorization
 {
@@ -12,7 +13,7 @@ class Authorization
         private UserRepository $userRepository
     ) {}
 
-    public function token(int $userId): array
+    public function token(int $userId): string
     {
         $key = $_ENV['JWT_SECRET_KEY'];
 
@@ -30,12 +31,6 @@ class Authorization
             ]
         ];
 
-        $jwt = \Firebase\JWT\JWT::encode($payload, $key, 'HS256');
-
-        return [
-            'email' =>  $user['email'],
-            'token' => $jwt
-        ];
-
+        return JWT::encode($payload, $key, 'HS256');
     }
 }

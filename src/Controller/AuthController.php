@@ -28,14 +28,20 @@ class AuthController
         $validated = $this->userRegistrationValidator->validate($data);
 
         if (!$validated) {
-           return $this->error('There was a problem with your submission.', $this->userRegistrationValidator->errorBag(), 422);
+            return $this->error('There was a problem with your submission.', $this->userRegistrationValidator->errorBag(), 422);
         }
 
         $userId = $this->userRepository->create($validated);
 
-        $auth = $this->authorization->token($userId);
+        $user = $this->userRepository->getById($userId);
 
-        $payload = json_encode($auth);
+        $payload = json_encode([
+            'user' => $user['name'],
+            'email' => $user['email'],
+            'created_at' => $user['created_at'],
+            'updated_at' => $user['updated_at'],
+            'token' => $this->authorization->token($user['id'])
+        ]);
 
         $response->getBody()->write($payload);
 
