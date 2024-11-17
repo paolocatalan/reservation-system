@@ -25,11 +25,19 @@ class OrderController
 
     public function index(Request $request, Response $response): Response
     {
-        $data = $this->orderRepository->fetchFutureDates();
+        $data = (array) $request->getQueryParams();
 
-        $body = json_encode($data);
+        $orders = $this->orderRepository->getAll((int) $data['offset'], (int) $data['limit']);
+        $ordersCount = $this->orderRepository->getOrdersCount();
+        $totalPages = round($ordersCount/$data['limit']);
 
-        $response->getBody()->write($body);
+        $payload = json_encode([
+            'orders' => $orders,
+            'total_count' => $ordersCount,
+            'total_pages' => $totalPages
+        ]);
+
+        $response->getBody()->write($payload);
 
         return $response;
     }

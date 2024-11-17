@@ -4,14 +4,27 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use PDO;
+
 class OrderRepository extends BaseRepository
 {
-    public function getAll(): array
+    public function getAll(int $page = 1, int $resultsPerPage = 10): array
     {
-        $stmt = $this->database->query('SELECT * FROM `order`');
+        //validate and sanitize input
+        $page = filter_var($page, FILTER_VALIDATE_INT, ['options' => ['default' => 1, 'min_range' => 1]]);
+        $resultsPerPage = filter_var($resultsPerPage, FILTER_VALIDATE_INT, ['options' => ['default' => 10, 'min_range' => 1]]);
+
+        $offset = ($page - 1) * $resultsPerPage;
+
+        $stmt = $this->database->prepare("SELECT * FROM `order` LIMIT :limit OFFSET :offset");
+
+        $stmt->bindValue(':limit', $resultsPerPage, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
+        $stmt->execute();
 
         return $stmt->fetchAll();
-    } 
+    }
 
     public function getByOrderId(int $id): array
     {
@@ -79,5 +92,12 @@ class OrderRepository extends BaseRepository
         ');
 
         return $stmt->fetchAll();
+    }
+    
+    public function getOrdersCount()
+    {
+        $stmt = $this->database->query('SELECT COUNT(*) AS total_orders FROM `order`');
+
+        return $stmt->fetch()['total_orders'];
     }
 }
