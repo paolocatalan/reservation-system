@@ -27,7 +27,11 @@ class OrderController
     {
         $data = (array) $request->getQueryParams();
 
-        $orders = $this->orderRepository->getAll((int) $data['limit'], (int) $data['offset']);
+        //validate and sanitize input
+        $resultsPerPage = filter_var($data['limit'], FILTER_VALIDATE_INT, ['options' => ['default' => 10, 'min_range' => 1]]);
+        $page = filter_var($data['offset'], FILTER_VALIDATE_INT, ['options' => ['default' => 1, 'min_range' => 1]]);
+ 
+        $orders = $this->orderRepository->getAll((int) $resultsPerPage, (int) $page);
         $ordersCount = $this->orderRepository->getOrdersCount();
         $totalPages = ceil($ordersCount/$data['limit']);
 
