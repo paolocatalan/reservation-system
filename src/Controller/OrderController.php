@@ -27,9 +27,9 @@ class OrderController
     {
         $data = (array) $request->getQueryParams();
 
-        $orders = $this->orderRepository->getAll((int) $data['offset'], (int) $data['limit']);
+        $orders = $this->orderRepository->getAll((int) $data['limit'], (int) $data['offset']);
         $ordersCount = $this->orderRepository->getOrdersCount();
-        $totalPages = round($ordersCount/$data['limit']);
+        $totalPages = ceil($ordersCount/$data['limit']);
 
         $payload = json_encode([
             'orders' => $orders,

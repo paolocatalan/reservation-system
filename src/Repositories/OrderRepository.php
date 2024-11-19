@@ -8,12 +8,12 @@ use PDO;
 
 class OrderRepository extends BaseRepository
 {
-    public function getAll(int $page = 1, int $resultsPerPage = 10): array
+    public function getAll(int $resultsPerPage = 10, int $page = 1): array
     {
         //validate and sanitize input
+       $resultsPerPage = filter_var($resultsPerPage, FILTER_VALIDATE_INT, ['options' => ['default' => 10, 'min_range' => 1]]);
         $page = filter_var($page, FILTER_VALIDATE_INT, ['options' => ['default' => 1, 'min_range' => 1]]);
-        $resultsPerPage = filter_var($resultsPerPage, FILTER_VALIDATE_INT, ['options' => ['default' => 10, 'min_range' => 1]]);
-
+ 
         $offset = ($page - 1) * $resultsPerPage;
 
         $stmt = $this->database->prepare("SELECT * FROM `order` LIMIT :limit OFFSET :offset");
