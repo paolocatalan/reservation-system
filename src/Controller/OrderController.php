@@ -28,12 +28,12 @@ class OrderController
         $data = (array) $request->getQueryParams();
 
         //validate and sanitize input
-        $resultsPerPage = filter_var($data['limit'], FILTER_VALIDATE_INT, ['options' => ['default' => 10, 'min_range' => 1]]);
+        $pageSize = filter_var($data['limit'], FILTER_VALIDATE_INT, ['options' => ['default' => 10, 'min_range' => 1]]);
         $page = filter_var($data['offset'], FILTER_VALIDATE_INT, ['options' => ['default' => 1, 'min_range' => 1]]);
  
-        $orders = $this->orderRepository->getAll((int) $resultsPerPage, (int) $page);
+        $orders = $this->orderRepository->getAll((int) $pageSize, (int) $page);
         $ordersCount = $this->orderRepository->getOrdersCount();
-        $totalPages = ceil($ordersCount/$data['limit']);
+        $totalPages = ceil($ordersCount/$page);
 
         $payload = json_encode([
             'orders' => $orders,

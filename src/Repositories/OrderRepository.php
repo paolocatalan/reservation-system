@@ -8,13 +8,13 @@ use PDO;
 
 class OrderRepository extends BaseRepository
 {
-    public function getAll(int $resultsPerPage = 10,int $page = 1): array
+    public function getAll(int $pageSize = 10,int $page = 1): array
     {
-       $offset = ($page - 1) * $resultsPerPage;
+        $offset = $pageSize * ($page - 1);
 
         $stmt = $this->database->prepare("SELECT * FROM `order` LIMIT :limit OFFSET :offset");
 
-        $stmt->bindValue(':limit', $resultsPerPage, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $pageSize, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 
         $stmt->execute();
@@ -57,18 +57,18 @@ class OrderRepository extends BaseRepository
         return (int) $this->database->lastInsertId();
     }
 
-    public function getOrderByDates(string $startDate,string $endDate): array
+    public function getOrderByDates(string $afterDate,string $beforeDate): array
     {
         $stmt = $this->database->prepare('
             SELECT order.id, invoice_id, name, amount, room_type, checkin_date, checkout_date
             FROM `order`
             LEFT JOIN room
             ON order.id = room.order_id
-            WHERE checkin_date BETWEEN :start_date AND :end_date
+            WHERE checkin_date BETWEEN :after_date AND :before_date
             ');
 
-        $stmt->bindValue(':start_date', $startDate);
-        $stmt->bindValue(':end_date', $endDate);
+        $stmt->bindValue(':after_date', $afterDate);
+        $stmt->bindValue(':before_date', $beforeDate);
 
         $stmt->execute();
 
