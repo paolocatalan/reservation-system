@@ -22,22 +22,37 @@ class GetOrderByDateController
     {
         $data = (array) $request->getQueryParams();
 
-        $dateAfter = $this->validateDate($data['after']);
-        $dateBefore = $this->validateDate($data['before']);
+        if ($data['after'] && $data['before']) {
+            $dateAfter = $this->validateDate($data['after']);
+            $dateBefore = $this->validateDate($data['before']);
 
-        if (!$dateAfter || !$dateBefore) {
-            return $this->error('Invalid date format', null, 422);
+            if (!$dateAfter || !$dateBefore) {
+                return $this->error('Invalid date format', null, 422);
+            }
+        } else {
+            $dateAfter = date('Y-m-d' . ' 12:00:00');
+            $dateBefore = date('Y-m-d' . ' 12:00:00', strtotime('+30 days'));
         }
- 
-        $results = $this->orderRepository->getOrderByDates($dateAfter, $dateBefore);
 
-        if (empty($results)) {
+        $pageSize = filter_var($data['limit'], FILTER_VALIDATE_INT, ['options' => ['default' => 10, 'min_range' => 1]]);
+        $page = filter_var($data['offset'], FILTER_VALIDATE_INT, ['options' => ['default' => 1, 'min_range' => 1]]);
+ 
+        $records = $this->orderRepository->getOrderByDates($dateAfter, $dateBefore, $pageSize, $page);
+        $totalRecords = $this->orderRepository->getOrdersCount();
+        $totalPages = ceil($totalRecords/$pageSize);
+
+        if (empty($records)) {
            return $this->success('No results found.', null, 200);
         }
 
-        $payload = json_encode($results);
-
-        $response->getBody()->write($payload);
+        $response->getBody()->write(json_encode([
+            'data' => $records,
+            'pagination' => [
+                'total_records' => $totalRecords,
+                'total_pages' => $totalPages,
+                'current_page' => $page
+            ]
+        ]));
 
         return $response;
     }

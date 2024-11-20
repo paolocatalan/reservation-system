@@ -32,13 +32,16 @@ class OrderController
         $page = filter_var($data['offset'], FILTER_VALIDATE_INT, ['options' => ['default' => 1, 'min_range' => 1]]);
  
         $orders = $this->orderRepository->getAll((int) $pageSize, (int) $page);
-        $ordersCount = $this->orderRepository->getOrdersCount();
-        $totalPages = ceil($ordersCount/$page);
+        $totalRecords = $this->orderRepository->getOrdersCount();
+        $totalPages = ceil($totalRecords/$pageSize);
 
         $payload = json_encode([
-            'orders' => $orders,
-            'total_count' => $ordersCount,
-            'total_pages' => $totalPages
+            'data' => $orders,
+            'pagination' => [
+                'total_records' => $totalRecords,
+                'total_pages' => $totalPages,
+                'current_page' => $page
+            ]
         ]);
 
         $response->getBody()->write($payload);

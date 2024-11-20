@@ -12,7 +12,7 @@ class OrderRepository extends BaseRepository
     {
         $offset = $pageSize * ($page - 1);
 
-        $stmt = $this->database->prepare("SELECT * FROM `order` LIMIT :limit OFFSET :offset");
+        $stmt = $this->database->prepare('SELECT * FROM `order` ORDER BY id LIMIT :limit OFFSET :offset');
 
         $stmt->bindValue(':limit', $pageSize, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
@@ -57,18 +57,24 @@ class OrderRepository extends BaseRepository
         return (int) $this->database->lastInsertId();
     }
 
-    public function getOrderByDates(string $afterDate,string $beforeDate): array
+    public function getOrderByDates(string $afterDate,string $beforeDate,int $pageSize = 10,int $page = 1): array
     {
+        $offset = $pageSize * ($page - 1);
+
         $stmt = $this->database->prepare('
             SELECT order.id, invoice_id, name, amount, room_type, checkin_date, checkout_date
             FROM `order`
             LEFT JOIN room
             ON order.id = room.order_id
             WHERE checkin_date BETWEEN :after_date AND :before_date
+            ORDER BY id
+            LIMIT :limit OFFSET :offset
             ');
 
         $stmt->bindValue(':after_date', $afterDate);
         $stmt->bindValue(':before_date', $beforeDate);
+        $stmt->bindValue(':limit', $pageSize, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 
         $stmt->execute();
 
