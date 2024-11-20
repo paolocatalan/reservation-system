@@ -66,8 +66,9 @@ class RoomRepository extends BaseRepository
 
     public function getAvailability(string $roomType, string $checkDate): int
     {
+        // docs recommends to use count star
         $stmt = $this->database->prepare('
-            SELECT COUNT(id) as room_type_count
+            SELECT COUNT(*) as room_type_count
             FROM room
             WHERE room_type = :room_type
             AND :check_availability_date BETWEEN checkin_date AND checkout_date
