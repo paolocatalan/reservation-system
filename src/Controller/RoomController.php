@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Enums\RoomType;
 use App\Repositories\RoomRepository;
 use App\Traits\HttpResponses;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -14,20 +15,38 @@ class RoomController
     use HttpResponses;
 
     public function __construct(
-        private RoomRepository $repository
+        private RoomRepository $roomRepository
     ) {}
 
-    public function index(Request $request, Response $response, string $type): Response
+    public function index(Request $request, Response $response): Response
     {
-        $results = $this->repository->getByRoomType(strtolower($type));
+        $data = (array) $request->getQueryParams();
 
-        if (empty($results)) {
-           return $this->success('No results found.', null, 200);
+        if (in_array($data['room_type'], array_column(RoomType::cases(), 'value'))) {
+            $roomType = $data['room_type'];
+        } else {
+            return $this->error('Invalid room type', null, 422);
         }
 
-        $payload = json_encode($results);
+        $pageSize = filter_var($data['limit'], FILTER_VALIDATE_INT, ['options' => ['default' => 10, 'min_range' => 1]]);
+        $page = filter_var($data['offset'], FILTER_VALIDATE_INT, ['options' => ['default' => 1, 'min_range' => 1]]);
 
-        $response->getBody()->write($payload);
+        $records = $this->roomRepository->getByRoomType($roomType, $pageSize, $page);
+        $totalRecords = $this->roomRepository->getRoomReservationCount();
+        $totalPages = ceil($totalRecords/$pageSize);
+
+        if (empty($records)) {
+            return $this->success('No results found.', null, 200);
+        }
+
+        $response->getBody()->write(json_encode([
+            'data' => $records,
+            'pagination' => [
+                'total_records' => $totalRecords,
+                'total_pages' => $totalPages,
+                'current_page' => $page
+            ]
+        ]));
 
         return $response;
     }

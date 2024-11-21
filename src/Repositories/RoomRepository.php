@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use PDO;
+
 class RoomRepository extends BaseRepository
 {
     public function getAll(): array
@@ -84,17 +86,25 @@ class RoomRepository extends BaseRepository
         return $result ? $result['room_type_count'] : 0;
     }
 
-    public function getByRoomType(string $type): array
+    public function getByRoomType(string $type, int $pageSize = 10, int $page = 1): array
     {
-        $query = 'SELECT * FROM room WHERE room_type = :room_type ORDER BY checkin_date DESC';
+        $offset = $pageSize * ($page - 1);
 
-        $stmt = $this->database->prepare($query); 
+        $stmt = $this->database->prepare('SELECT * FROM room WHERE room_type = :room_type ORDER BY checkin_date DESC LIMIT :limit OFFSET :offset'); 
 
-        $stmt->bindValue(':room_type', $type, \PDO::PARAM_STR);
+        $stmt->bindValue(':room_type', $type, PDO::PARAM_STR);
+        $stmt->bindValue(':limit', $pageSize, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 
         $stmt->execute();
 
         return $stmt->fetchAll();
     } 
 
+    public function getRoomReservationCount()
+    {
+        $stmt = $this->database->query('SELECT COUNT(*) AS total_room_reservation FROM room');
+
+        return $stmt->fetch()['total_room_reservation'];
+    }
 }

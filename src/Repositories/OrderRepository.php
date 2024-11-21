@@ -8,7 +8,7 @@ use PDO;
 
 class OrderRepository extends BaseRepository
 {
-    public function getAll(int $pageSize = 10,int $page = 1): array
+    public function getAll(int $pageSize = 10, int $page = 1): array
     {
         $offset = $pageSize * ($page - 1);
 
@@ -41,7 +41,7 @@ class OrderRepository extends BaseRepository
         return $order ? $order : [];
     }
 
-    public function create(array $order,int $invoiceId): int
+    public function create(array $order, int $invoiceId): int
     {
         $query = 'INSERT INTO `order` (invoice_id, amount, name, email, created_at, updated_at) VALUES (:invoice_id, :amount, :name, :email, NOW(), NOW())';
 
@@ -57,7 +57,7 @@ class OrderRepository extends BaseRepository
         return (int) $this->database->lastInsertId();
     }
 
-    public function getOrderByDates(string $afterDate,string $beforeDate,int $pageSize = 10,int $page = 1): array
+    public function getOrderByDates(string $afterDate, string $beforeDate, int $pageSize = 10, int $page = 1): array
     {
         $offset = $pageSize * ($page - 1);
 

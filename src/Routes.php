@@ -25,7 +25,7 @@ return function(App $app) {
         $group->post('/orders/dinnings/', FindTableByNameController::class)->add(new AuthMiddleware());
         $group->post('/orders/rooms/', FindRoomByNameController::class)->add(new AuthMiddleware());
 
-        $group->get('/orders/rooms/{type}', [RoomController::class, 'index'])->add(new AuthMiddleware());
+        $group->get('/orders/rooms/', [RoomController::class, 'index'])->add(new AuthMiddleware());
 
         $group->get('/orders/', GetOrderByDateController::class)->add(new AuthMiddleware());
 
