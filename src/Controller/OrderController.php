@@ -11,6 +11,8 @@ use App\Services\ReservationService;
 use App\Traits\HttpResponses;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class OrderController
 {
@@ -20,7 +22,8 @@ class OrderController
         private OrderRepository $orderRepository,
         private InvoiceService $invoiceService,
         private ReservationService $reservationService,
-        private StoreOrderValidator $storeOrderValidator
+        private StoreOrderValidator $storeOrderValidator,
+        private FilesystemAdapter $cache
     ) {}
 
     public function index(Request $request, Response $response): Response
@@ -30,13 +33,29 @@ class OrderController
         //validate and sanitize input
         $pageSize = filter_var($data['limit'], FILTER_VALIDATE_INT, ['options' => ['default' => 10, 'min_range' => 1]]);
         $page = filter_var($data['offset'], FILTER_VALIDATE_INT, ['options' => ['default' => 1, 'min_range' => 1]]);
- 
-        $orders = $this->orderRepository->getAll((int) $pageSize, (int) $page);
-        $totalRecords = $this->orderRepository->getOrdersCount();
+
+        $records = $this->cache->get('orders_' . $pageSize . $page, function (ItemInterface $item) use ($pageSize, $page): array {
+            $item->expiresAfter(3600);
+            $value = $this->orderRepository->getAll($pageSize, $page);
+
+            return $value;
+        });
+
+        if (empty($records)) {
+            return $this->success('No results found.', null, 200);
+        }
+
+        $totalRecords = $this->cache->get('orders_count', function (ItemInterface $item): int {
+            $item->expiresAfter(3600);
+            $value = $this->orderRepository->getOrdersCount();
+
+            return $value;
+        });
+
         $totalPages = ceil($totalRecords/$pageSize);
 
         $payload = json_encode([
-            'data' => $orders,
+            'data' => $records,
             'pagination' => [
                 'total_records' => $totalRecords,
                 'total_pages' => $totalPages,
