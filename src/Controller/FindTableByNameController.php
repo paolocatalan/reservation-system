@@ -21,7 +21,7 @@ class FindTableByNameController
     {
         $data = (array) $request->getParsedBody();
 
-        $results = $this->restaurantRepository->searchByName($data['name']);
+        $results = $this->restaurantRepository->searchByName(htmlspecialchars($data['name']));
 
         if (empty($results)) {
            return $this->success('No results found.', null, 200);

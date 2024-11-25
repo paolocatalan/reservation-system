@@ -45,7 +45,7 @@ class OrderController
             return $this->success('No results found.', null, 200);
         }
 
-        $totalRecords = $this->cache->get('orders_count', function (ItemInterface $item): int {
+        $totalRecords = $this->cache->get('order_count', function (ItemInterface $item): int {
             $item->expiresAfter(3600);
             $value = $this->orderRepository->getOrdersCount();
 

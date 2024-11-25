@@ -48,8 +48,8 @@ class RestaurantController
 
         $content = json_encode([
             'message' => 'Your table is reserved.',
-            'invoice number' => $invoice['id'],
-            'reservation details' => $data
+            'invoice_number' => $invoice['id'],
+            'reservation_details' => $data
         ]);
 
         $response->getBody()->write($content);

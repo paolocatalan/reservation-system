@@ -21,7 +21,7 @@ class FindRoomByNameController
     {
         $data = (array) $request->getParsedBody();
 
-        $results = $this->roomRepository->searchByName($data['name']);
+        $results = $this->roomRepository->searchByName(htmlspecialchars($data['name']));
 
         if (empty($results)) {
            return $this->success('No results found.', null, 200);
