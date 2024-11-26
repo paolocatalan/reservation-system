@@ -90,7 +90,15 @@ class RoomRepository extends BaseRepository
     {
         $offset = $pageSize * ($page - 1);
 
-        $stmt = $this->database->prepare('SELECT * FROM room WHERE room_type = :room_type ORDER BY checkin_date DESC LIMIT :limit OFFSET :offset'); 
+        $stmt = $this->database->prepare('
+            SELECT invoice_id, name, amount, room_type, checkin_date, checkout_date
+            FROM room
+            LEFT JOIN `order`
+            ON room.id = order.id
+            WHERE room_type = :room_type AND checkin_date > NOW()
+            ORDER BY checkin_date DESC
+            LIMIT :limit OFFSET :offset
+            '); 
 
         $stmt->bindValue(':room_type', $type, PDO::PARAM_STR);
         $stmt->bindValue(':limit', $pageSize, PDO::PARAM_INT);
@@ -101,10 +109,4 @@ class RoomRepository extends BaseRepository
         return $stmt->fetchAll();
     } 
 
-    public function getRoomReservationCount()
-    {
-        $stmt = $this->database->query('SELECT COUNT(*) AS total_room_reservation FROM room');
-
-        return $stmt->fetch()['total_room_reservation'];
-    }
 }

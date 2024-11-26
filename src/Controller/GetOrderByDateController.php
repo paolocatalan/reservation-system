@@ -51,18 +51,11 @@ class GetOrderByDateController
             return $this->success('No results found.', null, 200);
         }
 
-        $totalRecords = $this->cache->get('order_count', function (ItemInterface $item): int {
-            $item->expiresAfter(3600);
-            $value = $this->orderRepository->getOrdersCount();
-
-            return $value;
-        });
-
-        $totalPages = ceil($totalRecords / $pageSize);
+        $totalPages = ceil(count($records)/$pageSize);
         $response->getBody()->write(json_encode([
             'data' => $records,
             'pagination' => [
-                'total_records' => $totalRecords,
+                'total_records' => count($records),
                 'total_pages' => $totalPages,
                 'current_page' => $page,
             ],

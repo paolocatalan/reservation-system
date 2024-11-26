@@ -32,8 +32,7 @@ class RoomController
         $page = filter_var($data['offset'], FILTER_VALIDATE_INT, ['options' => ['default' => 1, 'min_range' => 1]]);
 
         $records = $this->roomRepository->getByRoomType($roomType, $pageSize, $page);
-        $totalRecords = $this->roomRepository->getRoomReservationCount();
-        $totalPages = ceil($totalRecords/$pageSize);
+        $totalPages = ceil(count($records)/$pageSize);
 
         if (empty($records)) {
             return $this->success('No results found.', null, 200);
@@ -42,7 +41,7 @@ class RoomController
         $response->getBody()->write(json_encode([
             'data' => $records,
             'pagination' => [
-                'total_records' => $totalRecords,
+                'total_records' => count($records),
                 'total_pages' => $totalPages,
                 'current_page' => $page
             ]
