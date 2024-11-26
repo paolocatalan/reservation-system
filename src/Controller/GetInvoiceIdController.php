@@ -21,13 +21,17 @@ class GetInvoiceIdController
     {
         $data = (array) $request->getParsedBody();
 
-        $results = $this->orderRepository->getInvoiceId((int) $data['invoice_id']);
+        if (filter_var($data['invoice_id'], FILTER_VALIDATE_INT) === false) {
+            return $this->error('Invalid Invoice ID', null, 244);        
+        }
 
-        if (empty($results)) {
+        $invoice = $this->orderRepository->getInvoiceId((int) $data['invoice_id']);
+
+        if (empty($invoice)) {
            return $this->success('No results found.', null, 200);
         }
 
-        $payload = json_encode($results);
+        $payload = json_encode($invoice);
 
         $response->getBody()->write($payload);
 

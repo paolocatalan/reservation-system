@@ -119,7 +119,9 @@ class OrderRepository extends BaseRepository
 
         $stmt->execute();
 
-        return $stmt->fetchAll();
+        $invoice = $stmt->fetch();
+
+        return $invoice ? $invoice : [];
     }
 
 }
