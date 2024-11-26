@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Controller\AuthController;
 use App\Controller\FindRoomByNameController;
 use App\Controller\FindTableByNameController;
+use App\Controller\GetInvoiceIdController;
 use App\Controller\GetOrderByDateController;
 use App\Controller\OrderController;
 use App\Controller\RestaurantController;
@@ -24,6 +25,7 @@ return function(App $app) {
 
         $group->post('/orders/dinnings/names', FindTableByNameController::class)->add(new AuthMiddleware());
         $group->post('/orders/rooms/names', FindRoomByNameController::class)->add(new AuthMiddleware());
+        $group->post('/orders/invoices', GetInvoiceIdController::class)->add(new AuthMiddleware());
 
         $group->get('/orders/rooms', [RoomController::class, 'index'])->add(new AuthMiddleware());
 

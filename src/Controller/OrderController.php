@@ -30,7 +30,6 @@ class OrderController
     {
         $data = (array) $request->getQueryParams();
 
-        //validate and sanitize input
         $pageSize = filter_var($data['limit'], FILTER_VALIDATE_INT, ['options' => ['default' => 10, 'min_range' => 1]]);
         $page = filter_var($data['offset'], FILTER_VALIDATE_INT, ['options' => ['default' => 1, 'min_range' => 1]]);
 

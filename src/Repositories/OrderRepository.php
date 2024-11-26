@@ -102,4 +102,24 @@ class OrderRepository extends BaseRepository
 
         return $stmt->fetch()['total_orders'];
     }
+
+    public function getInvoiceId(int $invoiceId): array
+    {
+        $stmt = $this->database->prepare('
+            SELECT invoice_id, amount, name, room_type, checkin_date, checkout_date, seats, table_setting, reservation_date
+            FROM `order`
+            LEFT JOIN room
+            ON order.id = room.order_id
+            LEFT JOIN restaurant
+            ON order.id = restaurant.order_id 
+            WHERE order.invoice_id = :invoice_id 
+            ');
+
+        $stmt->bindValue(':invoice_id', $invoiceId, PDO::PARAM_INT);
+
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
 }
