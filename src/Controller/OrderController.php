@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Monologger;
 use App\Repositories\OrderRepository;
 use App\RequestValidator\StoreOrderValidator;
 use App\Services\InvoiceService;
@@ -23,7 +24,8 @@ class OrderController
         private InvoiceService $invoiceService,
         private ReservationService $reservationService,
         private StoreOrderValidator $storeOrderValidator,
-        private FilesystemAdapter $cache
+        private FilesystemAdapter $cache,
+        private Monologger $monolog
     ) {}
 
     public function index(Request $request, Response $response): Response
@@ -67,7 +69,7 @@ class OrderController
         return $response;
     }
 
-    public function show(Request $request, Response $response, string $id): Response
+    public function show(Response $response, string $id): Response
     {
         $data = $this->orderRepository->getByOrderId((int) $id); 
 
@@ -100,6 +102,8 @@ class OrderController
             'invoice_id' => $invoice['id'],
             'order_id' => $orderId
         ]);
+
+        $this->monolog->logger->info('store new order');
 
         $response->getBody()->write($body);
 

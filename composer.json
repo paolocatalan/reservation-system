@@ -9,7 +9,8 @@
         "symfony/doctrine-messenger": "^7.1",
         "symfony/console": "^7.1",
         "firebase/php-jwt": "^6.10",
-        "symfony/cache": "^7.1"
+        "symfony/cache": "^7.1",
+        "monolog/monolog": "^3.8"
     },
     "autoload": {
         "psr-4": {
