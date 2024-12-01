@@ -6,6 +6,7 @@ namespace App\RequestValidator;
 
 use App\Enums\RoomType;
 use App\Enums\TableSetting;
+use App\Monologger;
 use App\Repositories\RestaurantRepository;
 use App\Repositories\RoomRepository;
 use Valitron\Validator;
@@ -16,7 +17,8 @@ class StoreOrderValidator
 
     public function __construct(
         protected RoomRepository $roomRepository,
-        protected RestaurantRepository $restaurantRepository
+        protected RestaurantRepository $restaurantRepository,
+        private Monologger $monologger
     ) {}
 
     public function validate(array $data): array|bool
@@ -68,7 +70,7 @@ class StoreOrderValidator
         $numbersOfRoom = match($roomType) {
             'Cabana' => 10,
             'Villa' => 5,
-            'Penthouse' => 2 
+            'Penthouse' => 2
         };
 
         if ($bookedRooms >= $numbersOfRoom) {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Database;
+use App\Monologger;
 use App\Repositories\OrderRepository;
 use App\Repositories\RestaurantRepository;
 use App\Repositories\RoomRepository;
@@ -15,7 +16,8 @@ class ReservationService
         private Database $database,
         private OrderRepository $orderRepository,
         private RestaurantRepository $restaurantRepository,
-        private RoomRepository $roomRepository
+        private RoomRepository $roomRepository,
+        private Monologger $monolog
     ) {}
 
     public function add(array $order, int $invoiceId): int 
@@ -36,6 +38,8 @@ class ReservationService
             if ($this->database->inTransaction()) {
                 $this->database->rollBack();
             }
+
+            $this->monolog->logger->critical($th->getMessage());
 
             throw $th;
         }

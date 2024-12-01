@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Monologger;
 use App\Repositories\OrderRepository;
 use App\Traits\HttpResponses;
 use DateTime;
@@ -18,7 +19,8 @@ class GetOrderByDateController
 
     public function __construct(
         private OrderRepository $orderRepository,
-        private FilesystemAdapter $cache
+        private FilesystemAdapter $cache,
+        private Monologger $monolog
     ) {}
 
     public function __invoke(Request $request, Response $response): Response
@@ -35,6 +37,7 @@ class GetOrderByDateController
         } else {
             $dateAfter = date('Y-m-d'.' 12:00:00');
             $dateBefore = date('Y-m-d'.' 12:00:00', strtotime('+30 days'));
+            $this->monolog->logger->warning('Search by date feature: date missing');
         }
 
         $pageSize = filter_var($data['limit'], FILTER_VALIDATE_INT, ['options' => ['default' => 10, 'min_range' => 1]]);
