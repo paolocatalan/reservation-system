@@ -24,9 +24,11 @@ class UserLoginValidator
             'password' => ['required'],
         ]);
 
-        $validator->rule(function($field, $value, $params, $fields) use ($data) {
-            return ($this->invalidCredentials($data['email'], $value));
-        }, 'password')->message('Invalid credentials.');
+        if ($data['email'] && $data['password']) {
+            $validator->rule(function($field, $value, $params, $fields) use ($data) {
+                return ($this->invalidCredentials($data['email'], $value));
+            }, 'password')->message('Invalid credentials.');
+        }
 
         if ($validator->validate()) {
             return ['email' => $data['email']];

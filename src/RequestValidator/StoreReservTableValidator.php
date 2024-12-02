@@ -7,6 +7,7 @@ namespace App\RequestValidator;
 use App\Enums\TableSetting;
 use App\Monologger;
 use App\Repositories\RestaurantRepository;
+use DateTime;
 use Valitron\Validator;
 
 class StoreReservTableValidator
@@ -32,7 +33,7 @@ class StoreReservTableValidator
             'credit_card' => ['required']
         ]);
 
-        if ($data['seats']) {
+        if ($data['seats'] && $this->isValidDate($data['restaurant_date'])) {
             $validator->rule(function($field, $value, $params, $fields) use ($data) {
                 return $this->isNotAvailable($value, (int) $data['seats']); 
             }, 'restaurant_date')->message('No available seat for your date.');
@@ -51,12 +52,18 @@ class StoreReservTableValidator
         return $this->errors;
     }
 
-    private function isNotAvailable(string $startTime, int $seats): bool {
-        $endTime = date('Y-m-d H:i:s', strtotime('+8 hours', strtotime($startTime)));
-        if (!$endTime) {
-            $this->monologger->logger->warning('Validation Error: Date is not valid.');
+    private function isValidDate(string $dateInput): bool {
+        $date = DateTime::createFromFormat('Y-m-d H:i:s', $dateInput);
+
+        if ($date && $date->format('Y-m-d H:i:s') == $dateInput) {
             return true;
         }
+
+        return false;
+    }
+
+    private function isNotAvailable(string $startTime, int $seats): bool {
+        $endTime = date('Y-m-d H:i:s', strtotime('+8 hours', strtotime($startTime)));
 
         $bookedSeats = $this->restaurantRepository->getReseverdSeats($startTime, $endTime);
 
