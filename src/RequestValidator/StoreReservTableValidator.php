@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\RequestValidator;
 
 use App\Enums\TableSetting;
+use App\Monologger;
 use App\Repositories\RestaurantRepository;
 use Valitron\Validator;
 
@@ -13,7 +14,8 @@ class StoreReservTableValidator
     private $errors = [];
 
     public function __construct(
-        protected RestaurantRepository $restaurantRepository
+        protected RestaurantRepository $restaurantRepository,
+        protected Monologger $monologger
     ) {}
 
     public function validate(array $data): array|bool
@@ -52,6 +54,7 @@ class StoreReservTableValidator
     private function isNotAvailable(string $startTime, int $seats): bool {
         $endTime = date('Y-m-d H:i:s', strtotime('+8 hours', strtotime($startTime)));
         if (!$endTime) {
+            $this->monologger->logger->warning('Validation Error: Date is not valid.');
             return true;
         }
 

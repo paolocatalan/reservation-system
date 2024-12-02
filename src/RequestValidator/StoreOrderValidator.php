@@ -18,7 +18,7 @@ class StoreOrderValidator
     public function __construct(
         protected RoomRepository $roomRepository,
         protected RestaurantRepository $restaurantRepository,
-        private Monologger $monologger
+        protected Monologger $monologger
     ) {}
 
     public function validate(array $data): array|bool
@@ -75,7 +75,7 @@ class StoreOrderValidator
         };
 
         if ($numbersOfRoom === false) {
-            $this->monologger->logger->warning('Validation error on room type');
+            $this->monologger->logger->warning('Validation Error: Room type unhandled match.');
             return true;
         }
 
@@ -89,6 +89,7 @@ class StoreOrderValidator
     private function isNotAvailable(string $startTime, int $seats): bool {
         $endTime = date('Y-m-d H:i:s', strtotime('+8 hours', strtotime($startTime)));
         if (!$endTime) {
+            $this->monologger->logger->warning('Validation Error: Date is not valid.');
             return true;
         }
 
