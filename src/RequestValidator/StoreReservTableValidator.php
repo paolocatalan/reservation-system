@@ -51,6 +51,9 @@ class StoreReservTableValidator
 
     private function isNotAvailable(string $startTime, int $seats): bool {
         $endTime = date('Y-m-d H:i:s', strtotime('+8 hours', strtotime($startTime)));
+        if (!$endTime) {
+            return true;
+        }
 
         $bookedSeats = $this->restaurantRepository->getReseverdSeats($startTime, $endTime);
 
@@ -59,11 +62,11 @@ class StoreReservTableValidator
             $numberOfSeats += $item['seats'];
         }
 
-        if ($numberOfSeats + $seats >= 20) {
-            return false;
+        if ($numberOfSeats + $seats <= 20) {
+            return true;
         }
 
-        return true;
+        return false;
     }
 
 }

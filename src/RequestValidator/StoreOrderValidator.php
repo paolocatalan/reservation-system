@@ -47,7 +47,7 @@ class StoreOrderValidator
         if ($data['restaurant_date']) {
             $validator->rule(function($field, $value, $params, $fields) use ($data) {
                 return $this->isNotAvailable($value, (int) $data['seats']); 
-            }, 'restaurant_date')->message('No available seat for your date.');
+            }, 'restaurant_date')->message('No available table seat for your date.');
         }
 
         if ($validator->validate()) {
@@ -70,18 +70,27 @@ class StoreOrderValidator
         $numbersOfRoom = match($roomType) {
             'Cabana' => 10,
             'Villa' => 5,
-            'Penthouse' => 2
+            'Penthouse' => 2,
+            default => false
         };
 
-        if ($bookedRooms >= $numbersOfRoom) {
-            return false;
+        if ($numbersOfRoom === false) {
+            $this->monologger->logger->warning('Validation error on room type');
+            return true;
         }
 
-        return true;
+        if ($bookedRooms <= $numbersOfRoom) {
+            return true;
+        }
+
+        return false;
     }
 
     private function isNotAvailable(string $startTime, int $seats): bool {
         $endTime = date('Y-m-d H:i:s', strtotime('+8 hours', strtotime($startTime)));
+        if (!$endTime) {
+            return true;
+        }
 
         $bookedSeats = $this->restaurantRepository->getReseverdSeats($startTime, $endTime);
 
@@ -90,11 +99,11 @@ class StoreOrderValidator
             $numberOfSeats += $item['seats'];
         }
 
-        if ($numberOfSeats + $seats >= 20) {
-            return false;
+        if ($numberOfSeats + $seats <= 20) {
+            return true;
         }
 
-        return true;
+        return false;
     }
 
 }
